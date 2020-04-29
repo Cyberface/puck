@@ -63,7 +63,11 @@ def get_co_prec_sym_waveform(ylm, kind='psi4', t1=None, t2=None, npts=5000):
     print("calc coprecessing frame")
     ylm_coprec = ylm_coprec.__calc_coprecessing_frame__()
     
-    t0_coprec = get_peak_time(ylm_coprec.radiation_axis_info.gwylmo[2,2][kind].t, ylm_coprec.radiation_axis_info.gwylmo[2,2][kind].amp)
+    # use 2nd half of data because junk radiation can be larger than merger peak
+    idx = int(len(ylm_coprec.radiation_axis_info.gwylmo[2,2][kind].t)/2)
+    # one waveform has a large spike at the very end - step back a bit to avoid it. not very robust!
+    end_idx = -500
+    t0_coprec = get_peak_time(ylm_coprec.radiation_axis_info.gwylmo[2,2][kind].t[idx:end_idx], ylm_coprec.radiation_axis_info.gwylmo[2,2][kind].amp[idx:end_idx])
     
     t_coprec_shift = ylm_coprec.radiation_axis_info.gwylmo[2,2][kind].t - t0_coprec
     
@@ -157,6 +161,9 @@ def save_data(screnty_ob, output_dir, lmax, gwylm_verbose, verbose, npts):
 
 if __name__ =="__main__":
 
+    # explicit list of sims from EZH
+    sims = ['q1a04t30_dPm2_T_96_552', 'q1a04t60_dPm1_T_96_552', 'q1a04t90_dP0_T_96_552', 'q1a04t120_dP0_T_96_552', 'q1a04t150_dP0_T_96_552',  'q1a08t30dPm25_T_96_408', 'q1a08t60dPm1.5_T_96_408', 'q1a08t90dPm1_T_96_408', 'q1a08t120dP0_T_96_408', 'q1a08t150dP0_T_96_408', 'q2a04t30dPm2_T_96_408', 'q2a04t60dPm1_T_96_408', 'q2a04t90dPm1_T_96_408', 'q2a04t120_T_96_408', 'q2a04t150_T_96_408', 'q2_a10_a28_ph0_th30', 'q2_a10_a28_ph0_th60', 'q2_a10_a28_ph0_th90', 'q2_a10_a28_ph0_th120', 'q2_a10_a28_ph0_th150', 'q4a04t30_T_96_360', 'q4a04t60dPm1.5D_T_96_360', 'q4a04t90_T_96_360', 'q4a04t120dP0D_T_96_360', 'q4a04t150_T_96_360', 'q4a08t30dPm5p5dRm47_T_96_360', 'q4a08t60dPm3dRm250_T_96_384', 'q4a08t90dPm1D_T_96_384', 'q4a08t120dP1_T_96_360', 'q4a08t150_T_96_360',  'q8a04t30dPm3_T_96_360', 'q8a04t60D_dPm1', 'q8a04t90dP0_T_96_360', 'q8a04t120dPp1_T_96_360', 'q8a04t150dP9_T_96_360', 'q8a08t30dPm9.35_r0.5_T_96_360', 'q8a08t60Ditm45dr075_96_360', 'q8a08t90dP0_T_96_384', 'q8a08t120dP2_r03_T_96_360', 'q8a08t150dP2_T_120_480']
+    
     # Search for simulations
     # A = scsearch(q=[3.9,8.1], institute='bam', verbose=True)
     A = scsearch(institute='bam', verbose=True, precessing=True)
@@ -167,5 +174,11 @@ if __name__ =="__main__":
     output_dir='data'
     npts=5000
     my_makedir(output_dir)
+        
     for obj in A:
-        save_data(screnty_ob=obj, output_dir=output_dir, lmax=lmax, gwylm_verbose=gwylm_verbose, verbose=verbose, npts=npts)
+        if obj.simname in sims:
+            if "ASJmodified" not in obj.metadata_file_location:
+                print("\n\n saving {}\n\n".format(obj.simname))
+                save_data(screnty_ob=obj, output_dir=output_dir, lmax=lmax, gwylm_verbose=gwylm_verbose, verbose=verbose, npts=npts)
+        else:
+            print("\n\n skipping {}".format(obj.simname))

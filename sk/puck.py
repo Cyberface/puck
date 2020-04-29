@@ -234,6 +234,7 @@ class Waveform(object):
     def plot_td(self, xlim=[None,None]):
 
         fig, axes = plt.subplots(1, 2, figsize=(20,5))
+        fig.suptitle(self.simname)
         axes[0].plot(self.td['times'], np.real(self.td['psi4']['psi4']))
         axes[1].plot(self.td['times'], np.real(self.td['strain']['strain']))
         axes[0].set_title('psi4')
@@ -266,6 +267,7 @@ class Waveform(object):
     def plot_fd(self, xlim=[None,None]):
 
         fig, axes = plt.subplots(1, 2, figsize=(20,5))
+        fig.suptitle(self.simname)
         axes[0].plot(self.fd['freqs'], self.fd['psi4']['amp'])
         axes[1].plot(self.fd['freqs'], self.fd['strain']['amp'])
         axes[0].set_title('psi4')
