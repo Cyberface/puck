@@ -25,7 +25,7 @@ def load_model(filename):
         obj = pickle.load(f)
     return obj
 
-def fit(X, y, dataname, parname, model, scaleX=False, scaleY=False, showplot=True):
+def fit(X, y, dataname, parname, model, scaleX=False, scaleY=False, showplot=True, verbose=False):
     """
     dataname {str}: used to make output directory
     
@@ -52,6 +52,15 @@ def fit(X, y, dataname, parname, model, scaleX=False, scaleY=False, showplot=Tru
         y = scale.apply_scaler(y, Y_scalers)
         scale.save_scalers(Y_scalers, os.path.join(subdir, "Y_scalers"))
 
+    if verbose:
+        print(f"X.shape: {X.shape}")
+        print(f"y.shape: {y.shape}")
+
+        print("X data")
+        print(X)
+        print("y data")
+        print(y)
+        
     model.fit(X, y)
     
     print("saving model")
