@@ -11,6 +11,9 @@ import phenom
 
 from scipy.fftpack import fft, ifft, fftfreq, rfft, rfftfreq, fftshift, ifftshift 
 
+import lal
+import lalsimulation as lalsim
+
 def planck_taper(times, t1, t2):
     """times: array of times
     t1. for t<=t1 then return 0
@@ -121,23 +124,50 @@ class Waveform(object):
         
         print("estimated remnant from fits:")
         print(f"final mass: {self.final_mass}")
-        print(f"final spin: {self.fin_spin}")
-        print(f"ringdown freq: {self.fring}")
-        print(f"ringdown damp: {self.fdamp}")
+        
+        
+        print("assuming non-precessing:")
+        print(f"(non-prec) final spin: {self.fin_spin_non_prec}")
+        print(f"(non-prec) ringdown freq: {self.fring_non_prec}")
+        print(f"(non-prec) ringdown damp: {self.fdamp_non_prec}")
+        
+        print("estimated using PhenomP final spin:")
+        print(f"(prec) final spin: {self.fin_spin}")
+        print(f"(prec) ringdown freq: {self.fring}")
+        print(f"(prec) ringdown damp: {self.fdamp}")
 
         
-    def get_remnant(self, eta, chi1z, chi2z):
-        self.fin_spin = phenom.remnant.FinalSpin0815(eta, chi1z, chi2z)
-        self.fring = phenom.remnant.fring(eta, chi1z, chi2z, self.fin_spin)
-        self.fdamp = phenom.remnant.fdamp(eta, chi1z, chi2z, self.fin_spin)
+    def get_remnant(self, eta, chi1x, chi1y, chi1z, chi2x, chi2y, chi2z):
+        """
+        assuming total mass is 1.
+        """
+        M = 1
+        m1, m2 = phenom.m1_m2_M_eta(M=M, eta=eta)
+        self.fin_spin = lalsim.SimPhenomUtilsPhenomPv3HMFinalSpin(m1=m1, m2=m2, chi1x=chi1x, chi1y=chi1y, chi1z=chi1z, chi2x=chi2x, chi2y=chi2y, chi2z=chi2z)
+        self.fin_spin_non_prec = phenom.remnant.FinalSpin0815(eta, chi1z, chi2z)
+        
+        self.fring, self.fdamp = self.get_fring_fdamp(eta, chi1z, chi2z, self.fin_spin)
+        self.fring_non_prec, self.fdamp_non_prec = self.get_fring_fdamp(eta, chi1z, chi2z, self.fin_spin_non_prec)
+        
         self.final_mass = 1.0 - phenom.EradRational0815(eta, chi1z, chi2z)
         
         self.fin_spin = float(f"{self.fin_spin:.6f}")
         self.fring = float(f"{self.fring:.6f}")
         self.fdamp = float(f"{self.fdamp:.6f}")
+        
+        self.fin_spin_non_prec = float(f"{self.fin_spin_non_prec:.6f}")
+        self.fring_non_prec = float(f"{self.fring_non_prec:.6f}")
+        self.fdamp_non_prec = float(f"{self.fdamp_non_prec:.6f}")
+        
         self.final_mass = float(f"{self.final_mass:.6f}")
-        
-        
+    
+
+    def get_fring_fdamp(self, eta, chi1z, chi2z, final_spin):
+        fring = phenom.remnant.fring(eta, chi1z, chi2z, final_spin)
+        fdamp = phenom.remnant.fdamp(eta, chi1z, chi2z, final_spin)
+        return fring, fdamp
+
+    
     def read_data(self, filename):
         with h5py.File(filename, 'r') as f:
             
@@ -166,7 +196,7 @@ class Waveform(object):
                 X1, X2 = X2, X1
             simname = f.attrs['simname'].decode("utf-8") # convert from bytes to string
             
-            self.get_remnant(eta, X1[2], X2[2])
+            self.get_remnant(eta, X1[0], X1[1], X1[2], X2[0], X2[1], X2[2])
             
         return times, psi4, strain, psi4_amp, strain_amp, psi4_phi, strain_phi, psi4_dphi, strain_dphi, eta, X1, X2, simname
     
