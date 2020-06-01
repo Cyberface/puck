@@ -148,7 +148,7 @@ def get_co_prec_sym_waveform(ylm, kind='psi4', t1=None, t2=None, npts=5000):
     ylm_coprec = ylm.__calc_initial_j_frame__()
     
     print("calc coprecessing frame")
-    ylm_coprec = ylm_coprec.__calc_coprecessing_frame__()
+    ylm_coprec = ylm_coprec.__calc_coprecessing_frame__(transform_domain='td', kind=kind)
     
     # use 2nd half of data because junk radiation can be larger than merger peak
     idx = int(len(ylm_coprec.radiation_axis_info.gwylmo[2,2][kind].t)/2)
