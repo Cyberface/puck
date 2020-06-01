@@ -235,7 +235,6 @@ def save_data(screnty_ob, output_dir, lmax, gwylm_verbose, verbose, npts):
     strain_data = resample_complex(coprec_sym_dict['psi4']['t'], coprec_sym_dict['strain']['h22'], new_times)
     
     
-    print("FIXME")
     print("need to rotated the X1, X2 spins to L frame!")
     
     Lhat = obj.L / np.linalg.norm(obj.L)
