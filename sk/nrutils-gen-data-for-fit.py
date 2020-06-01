@@ -10,6 +10,93 @@ from nrutils import scsearch,gwylm
 
 from nrutils.core.nrsc import *
 
+
+def Rx(rho):
+    """Rx(rho)
+    input
+    =====
+    rho (radians)
+    returns
+    =======
+    matrix to rotate about x-axis by an angle rho(rad)
+    matrix from mathematica
+    Rx = RotationMatrix[\[Rho], {1, 0, 0}]
+    """
+    c, s = np.cos(rho), np.sin(rho)
+    return np.array([[1, 0, 0], [0, c, -s], [0, s, c]])
+
+def Ry(epsilon):
+    """Ry(epsilon)
+    input
+    =====
+    espilon (radians)
+    returns
+    =======
+    matrix to rotate about y-axis by an angle epsilon(rad)
+    matrix from mathematica
+    Ry = RotationMatrix[\[Epsilon], {0, 1, 0}]
+    """
+    c, s = np.cos(epsilon), np.sin(epsilon)
+    return np.array([[c, 0, s], [0, 1, 0], [-s, 0, c]])
+
+def Rz(sigma):
+    """Rz(sigma)
+    input
+    =====
+    sigma (radians)
+    returns
+    =======
+    matrix to rotate about y-axis by an angle sigma(rad)
+    matrix from mathematica
+    Rz = RotationMatrix[\[Sigma], {0, 0, 1}]"""
+    c, s = np.cos(sigma), np.sin(sigma)
+    return np.array([[c, -s, 0], [s, c, 0], [0, 0, 1]])
+
+def angleBetween(v1hat, v2hat):
+    """angleBetween(v1hat, v2hat)
+    computes the polar (epsilon) and azimuthal (sigma)
+    angle between the two input unit vectors v1hat and v2hat
+    input
+    =====
+    v1hat = [[v1hatx], [v1haty], [v1hatz]] i.e.
+    Carteisan frame v1hat = [[1,0,0],[0,1,0],[0,0,1]]
+    v2hat = [v2hatx, v2haty, v2hatz] i.e.,
+    Orbital angular momentum LN = [LNx, LNy, LNz]
+    return
+    ======"""
+    epsilonRAD = np.arccos(np.dot(v1hat[2], v2hat))
+#   this is what I would do in Python
+#     sigmaRAD = np.arctan2(Jhat[0], Jhat[1])
+#   this is what agrees with mathematica
+    dot1 = np.dot( v1hat[1], v2hat )
+    dot2 = np.dot( v1hat[0], v2hat )
+    sigmaRAD = np.arctan2( dot1, dot2 )
+    return epsilonRAD, sigmaRAD
+
+
+def cart_to_polar(x, y, z):
+    """
+    cartesian to spherical polar transformation.
+    phi (azimuthal angle) between [0, 2*pi]
+    returns: r, theta, phi
+    """
+    hxy = np.hypot(x, y)
+    r = np.hypot(hxy, z)
+    theta = np.arctan2(hxy, z)
+    phi = np.arctan2(y, x)
+    phi = phi % (2 * np.pi)
+    return r, theta, phi
+
+def polar_to_cart(r, theta, phi):
+    """
+    spherical polar to cartesian transformation
+    returns: x, y, z
+    """
+    x = r * np.sin(theta) * np.cos(phi)
+    y = r * np.sin(theta) * np.sin(phi)
+    z = r * np.cos(theta)
+    return x, y, z
+
 def my_makedir(path):
     if not os.path.isdir(path):
         os.mkdir(path)
@@ -147,12 +234,38 @@ def save_data(screnty_ob, output_dir, lmax, gwylm_verbose, verbose, npts):
     psi4_data = resample_complex(coprec_sym_dict['psi4']['t'], coprec_sym_dict['psi4']['h22'], new_times)
     strain_data = resample_complex(coprec_sym_dict['psi4']['t'], coprec_sym_dict['strain']['h22'], new_times)
     
+    
+    print("FIXME")
+    print("need to rotated the X1, X2 spins to L frame!")
+    
+    Lhat = obj.L / np.linalg.norm(obj.L)
+    epsilon, sigma = angleBetween( [[1,0,0],[0,1,0], [0,0,1]], Lhat)
+    
+    print("polar angle to rotate by: ", epsilon)
+    print("azimuthal angle to rotate by: ", sigma)
+    
+    rotor = np.dot(Ry(-epsilon), Rz(-sigma))
+    
+    Lhat_along_z = np.dot(rotor, Lhat)
+    np.testing.assert_array_almost_equal([0,0,1], Lhat_along_z, decimal=6, err_msg="rotated Lhat is not equal to [0,0,1] to current accuracy.")
+    
+    X1_along_z = np.dot(rotor, obj.X1)
+    X2_along_z = np.dot(rotor, obj.X2)
+    
+    print("obj.X1 = ", obj.X1)
+    print("obj.X2 = ", obj.X2)
+    
+    print("X1_along_z = ", X1_along_z)
+    print("X2_along_z = ", X2_along_z)
+    
     if verbose:
         print("making file: {}".format(output_filename))
     with h5py.File(output_filename, "w") as f:
         f.attrs['simname'] = obj.simname
-        f.attrs['X1'] = obj.X1
-        f.attrs['X2'] = obj.X2
+        f.attrs['og_X1'] = obj.X1
+        f.attrs['og_X2'] = obj.X2
+        f.attrs['rot_X1'] = X1_along_z
+        f.attrs['rot_X2'] = X2_along_z
         f.attrs['eta'] = obj.eta
         
         f.create_dataset("times", data=new_times)

@@ -122,6 +122,8 @@ class Waveform(object):
         print(f"X1: {self.X1}")
         print(f"X2: {self.X2}")
         
+        print(f"chip: {self.chip}")
+        
         print("estimated remnant from fits:")
         print(f"final mass: {self.final_mass}")
         
@@ -143,7 +145,10 @@ class Waveform(object):
         """
         M = 1
         m1, m2 = phenom.m1_m2_M_eta(M=M, eta=eta)
-        self.fin_spin = lalsim.SimPhenomUtilsPhenomPv3HMFinalSpin(m1=m1, m2=m2, chi1x=chi1x, chi1y=chi1y, chi1z=chi1z, chi2x=chi2x, chi2y=chi2y, chi2z=chi2z)
+        
+        self.chip = lalsim.SimPhenomUtilsChiP(m1, m2, chi1x, chi1y, chi1z, chi2x, chi2y, chi2z)
+
+        self.fin_spin = lalsim.SimPhenomUtilsPhenomPv2FinalSpin(m1, m2, chi1z, chi2z, self.chip)
         self.fin_spin_non_prec = phenom.remnant.FinalSpin0815(eta, chi1z, chi2z)
         
         self.fring, self.fdamp = self.get_fring_fdamp(eta, chi1z, chi2z, self.fin_spin)
@@ -189,8 +194,8 @@ class Waveform(object):
                 
                 
             # swap spins - should only have spins on larger BH
-            X1 = f.attrs['X1']
-            X2 = f.attrs['X2']
+            X1 = f.attrs['rot_X1']
+            X2 = f.attrs['rot_X2']
             # assumes single spin
             if all(X1==0):
                 X1, X2 = X2, X1
