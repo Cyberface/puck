@@ -146,7 +146,7 @@ class Waveform(object):
         M = 1
         m1, m2 = phenom.m1_m2_M_eta(M=M, eta=eta)
         
-        self.chip = lalsim.SimPhenomUtilsChiP(m1, m2, chi1x, chi1y, chi1z, chi2x, chi2y, chi2z)
+        self.chip = lalsim.SimPhenomUtilsChiP(m1, m2, chi1x, chi1y, chi2x, chi2y)
 
         self.fin_spin = lalsim.SimPhenomUtilsPhenomPv2FinalSpin(m1, m2, chi1z, chi2z, self.chip)
         self.fin_spin_non_prec = phenom.remnant.FinalSpin0815(eta, chi1z, chi2z)
