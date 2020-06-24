@@ -148,17 +148,16 @@ for a in A:
     savefig( file_path )
     
     # Select and output amplitude and phase data
-    t = frame['raw'].t
     f = frame['raw'].f
     fd_amp  = frame['sym-cp-y-fd'][2,2]['strain'].fd_amp
     fd_dphi = frame['sym-cp-y-fd'][2,2]['psi4'].fd_dphi
     td_amp  = frame['sym-cp-y-td'][2,2]['strain'].fd_amp
     td_dphi = frame['sym-cp-y-td'][2,2]['psi4'].fd_dphi
-    data_array = array([ t,f, td_amp, fd_amp, td_dphi, fd_dphi ]).T
+    data_array = array([ f, td_amp, fd_amp, td_dphi, fd_dphi ]).T
 
     #
     alert('Saving waveform data to "%s"'%yellow(txt_file_path))
     # pickle.dump( data_array, open( file_path, "wb" ) )
-    savetxt( txt_file_path, data_array, header='[ t,f, td_amp, fd_amp, td_dphi, fd_dphi ], here td and fd refer to the frame type used; frequencies are positive, waveform info are symmetrized in the psi4 TD/FD coprecessing frame from NR simulation at %s'%frame['raw'].simdir )
+    savetxt( txt_file_path, data_array, header='[ f, td_amp, fd_amp, td_dphi, fd_dphi ], here td and fd refer to the frame type used; frequencies are positive, waveform info are symmetrized in the psi4 TD/FD coprecessing frame from NR simulation at %s'%frame['raw'].simdir )
     
 alert('All done.')

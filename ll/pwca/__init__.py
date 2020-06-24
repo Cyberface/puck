@@ -9,6 +9,8 @@ alert(yellow('Warm greetings from Welsh Puck (aka pwca)')+'.',fname='init')
 
 # Import local dependencies
 from . import ansatz
+from . import core
 from . import d
 from . d import *
 from . ansatz import *
+from . core import *
