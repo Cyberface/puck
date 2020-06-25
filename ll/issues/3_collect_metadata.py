@@ -7,13 +7,18 @@ from nrutils import scsearch
 from glob import glob
 from numpy.linalg import norm
 from pwca import determine_data_fitting_region,pwca_catalog
+import pickle
 
 #
 datadir = '/Users/book/KOALA/puck/ll/data/version2/'
 files = glob( datadir+'*.txt' )
 
 #
+alert('We have %s files to consider.'%red(str(len(files))))
+
+#
 metadata = []
+simnames = []
 
 #
 alert('Using %s and txt files at %s to gather metadata...'%(magenta('pwca_catalog'),magenta(datadir)))
@@ -26,10 +31,7 @@ for f in files:
     file_name = f.split('/')[-1].split('.')[0]
 
     #
-    catalog = pwca_catalog
-
-    #
-    A = scsearch( keyword=file_name, verbose=not True, catalog=catalog )
+    A = scsearch( keyword=file_name, verbose=not True, catalog=pwca_catalog )
 
     #
     a = A[0]
@@ -41,7 +43,7 @@ for f in files:
     #
     if 'th' in file_name:
         foo = file_name.split('th')[-1]
-    elif 't' in file_name:
+    else:
         foo = file_name.split('Dit')[0]
         foo = foo.split('t')[-1]
         foo = foo.lower().split('d')[0]
@@ -70,33 +72,37 @@ for f in files:
     delta = (m1-m2)/(m1+m2)
     
     #
-    metadata.append( [ file_name,
-                      theta,
-                      eta,
-                      delta,
-                      chi_eff,
-                      chi_p,
-                      chi1,
-                      chi2 ] )
+    simnames.append(file_name)
+    metadata.append( [ theta,
+                       eta,
+                       delta,
+                       chi_eff,
+                       chi_p,
+                       chi1,
+                       chi2 ] )
 
 #
 print 'Done.'
 
 #
 metadata_array = array(metadata)
+
+#
+keys = [ 'theta', 'eta', 'delta', 'chi_eff', 'chi_p', 'chi1', 'chi2' ]
+
+#
 metadata_dict = {}
+metadata_dict = { keys[k]: metadata_array[:,k] for k in range(len(keys)) }
+metadata_dict['simname'] = simnames
 
 #
-keys = [ 'simname', 'theta', 'eta', 'delta', 'chi_eff', 'chi_p', 'chi1', 'chi2' ]
-metadata_dict = { keys[k]:metadata_array[k] for k in range(len(keys)) }
-
-#
+metadata_dict['array_data_columns'] = keys
 metadata_dict['array_data'] = metadata_array
 
 #
-metadata_path = '/Users/book/KOALA/puck/ll/data/metadata_dict'
-alert('Saving metadata dictionary to %s'%magenta(metadata_path+'.npz'))
-savez(metadata_path,metadata_dict)
+metadata_path = '/Users/book/KOALA/puck/ll/data/metadata_dict.pickle'
+alert('Saving metadata dictionary to %s'%magenta(metadata_path))
+pickle.dump( metadata_dict, open( metadata_path, "wb" ) )
 
 #
 alert('Saving complete.')

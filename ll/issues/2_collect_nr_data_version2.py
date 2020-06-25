@@ -20,6 +20,7 @@ from nrutils import scsearch, gwylm
 from glob import glob
 import h5py
 from os import path
+import pickle
 
 # Preliminaries 
 # --
@@ -36,6 +37,11 @@ simulation_keywords = ('q1a04t30_dPm2_T_96_552', 'q1a04t60_dPm1_T_96_552', 'q1a0
 
 # Find select simulations using scsearch
 A = scsearch( keyword=simulation_keywords, notkeyword=('80_Points','ASJmodified','.0.1.0','q8precessing/q8a04t60D_dPm1/'), verbose= True, unique=True )
+
+#
+catalog_path = '/Users/book/KOALA/puck/ll/data/pwca_catalog.pickle'
+alert('Saving scentry catalog list to %s'%magenta(catalog_path))
+pickle.dump( A, open( catalog_path, "wb" ) )
 
 # Let the people know.
 alert('We have found %i simulations.'%len(A))

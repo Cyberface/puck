@@ -3,38 +3,18 @@
 #
 import pickle
 from positive import alert,magenta
+from numpy import load
+from os.path import exists
 
-# Always load metadata for calibration runs 
-metadata_path = '/Users/book/KOALA/puck/ll/data/pwca_catalog.sce'
-pwca_catalog = pickle.load( open( metadata_path, "rb" ) )
-alert('Metadata for calibration runs stored to %s'%magenta('"pwca.pwca_catalog"'),fname='pwca.core')
+# Always load catalog list for calibration runs 
+pwca_catalog_path = '/Users/book/KOALA/puck/ll/data/pwca_catalog.pickle'
+pwca_catalog = pickle.load( open( pwca_catalog_path, "rb" ) )
+alert('Catalog of calibration runs stored to %s'%magenta('"pwca.pwca_catalog"'),fname='pwca.core')
 
-# Function to collect metadata for run 
-def collect_file_metadata(f,catalog=None):
-    
-    #
-    import pickle
-    
-    #
-    file_name = f.split('/')[-1].split('.')[0]
-    
-    #
-    if catalog is None:
-        catalog = pwca_catalog
-    
-    #
-    A = scsearch( keyword=file_name, verbose=True, catalog=catalog )
-    
-    #
-    a = A[0]
-    
-    #
-    m1,m2 = a.m1,a.m2 
-    eta = m1*m2/(m1+m2)
-    theta = None
-    
-    #
-    return A[0]
+# Always load curated metadata for calibration runs 
+metadata_dict_path = '/Users/book/KOALA/puck/ll/data/metadata_dict.pickle'
+metadata_dict = load(metadata_dict_path)
+alert('Metadata dictionary for calibration runs stored to %s'%magenta('"pwca.metadata_dict"'),fname='pwca.core')
 
 # Function to determine version2 data fitting region
 def determine_data_fitting_region( data, fmin=0.03, fmax=0.12 ):
@@ -60,8 +40,9 @@ def determine_data_fitting_region( data, fmin=0.03, fmax=0.12 ):
     knot = argmin(y)
     
     # Determine new fmin and max using heuristic 
-    new_fmin = f[mask][knot] * 0.325
-    new_fmax = f[mask][knot] + 0.025 
+    f_knot = f[mask][knot]
+    new_fmin = f_knot * 0.325
+    new_fmax = f_knot + 0.025 
     
     #
     new_mask = (f>=new_fmin) & (f<=new_fmax)
@@ -71,4 +52,4 @@ def determine_data_fitting_region( data, fmin=0.03, fmax=0.12 ):
     new_knot = find(f>=fmin)[0]+knot
     
     #
-    return new_data,new_knot,new_fmin,new_fmax
+    return new_data,new_knot,new_fmin,new_fmax,f_knot

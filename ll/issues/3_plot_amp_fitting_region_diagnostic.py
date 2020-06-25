@@ -42,7 +42,7 @@ for k in range(len(data)):
     f,amp_td,amp_fd,dphi_td,dphi_fd = data[k]
     
     #
-    new_data,new_knot,new_fmin,new_fmax = determine_data_fitting_region(data[k])
+    new_data,new_knot,new_fmin,new_fmax,_ = determine_data_fitting_region(data[k])
     plot( f[new_knot], amp_fd[new_knot], color='k', mfc='none', marker='o', ms=20, mew=4, alpha = 0.15  )
     axvline( new_fmin, color='k', ls='-',lw=8,alpha = 0.15 )
     axvline( new_fmax, color='k', ls='-',lw=8,alpha = 0.15 )
