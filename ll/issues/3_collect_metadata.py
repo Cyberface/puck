@@ -94,7 +94,7 @@ metadata_dict = { keys[k]:metadata_array[k] for k in range(len(keys)) }
 metadata_dict['array_data'] = metadata_array
 
 #
-metadata_path = '/Users/book/KOALA/puck/ll/data/metadata'
+metadata_path = '/Users/book/KOALA/puck/ll/data/metadata_dict'
 alert('Saving metadata dictionary to %s'%magenta(metadata_path+'.npz'))
 savez(metadata_path,metadata_dict)
 
