@@ -1,5 +1,41 @@
 
 
+#
+import pickle
+from positive import alert,magenta
+
+# Always load metadata for calibration runs 
+metadata_path = '/Users/book/KOALA/puck/ll/data/pwca_catalog.sce'
+pwca_catalog = pickle.load( open( metadata_path, "rb" ) )
+alert('Metadata for calibration runs stored to %s'%magenta('"pwca.pwca_catalog"'),fname='pwca.core')
+
+# Function to collect metadata for run 
+def collect_file_metadata(f,catalog=None):
+    
+    #
+    import pickle
+    
+    #
+    file_name = f.split('/')[-1].split('.')[0]
+    
+    #
+    if catalog is None:
+        catalog = pwca_catalog
+    
+    #
+    A = scsearch( keyword=file_name, verbose=True, catalog=catalog )
+    
+    #
+    a = A[0]
+    
+    #
+    m1,m2 = a.m1,a.m2 
+    eta = m1*m2/(m1+m2)
+    theta = None
+    
+    #
+    return A[0]
+
 # Function to determine version2 data fitting region
 def determine_data_fitting_region( data, fmin=0.03, fmax=0.12 ):
     '''
