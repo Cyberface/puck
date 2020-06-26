@@ -90,6 +90,7 @@ for k in range(len(data)):
     title(files[k].split('/')[-1].split('.')[0],loc='left',size=12)
 
 #
+print ''
 alert('Done.')
 file_path = datadir+'dphi_fitting_region_diagnostic.pdf'
 alert('Saving batch plot to %s'%magenta(file_path))

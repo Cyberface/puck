@@ -11,7 +11,7 @@ import pickle
 
 #
 datadir = '/Users/book/KOALA/puck/ll/data/version2/'
-files = glob( datadir+'*.txt' )
+files = glob( datadir+'q*.txt' )
 
 #
 alert('We have %s files to consider.'%red(str(len(files))))
@@ -23,9 +23,6 @@ simnames = []
 #
 alert('Using %s and txt files at %s to gather metadata...'%(magenta('pwca_catalog'),magenta(datadir)))
 for f in files:
-    
-    #
-    print '.',
 
     #
     file_name = f.split('/')[-1].split('.')[0]
@@ -35,34 +32,33 @@ for f in files:
 
     #
     a = A[0]
+    
+    #
+    l = a.L/norm(a.L)
+    if ('q1a' in file_name) and (norm(a.X1)<norm(a.X2)):
+        warning(magenta('Flipping 1-2 labels in euqal mass case'),fname=file_name)
+        a.X1,a.X2 = [ array(k) for k in (a.X2,a.X1) ]
+        a.m1,a.m2 = [ float(k) for k in (a.m2,a.m1) ]
+        print '\t * chi1_l = ',dot(a.X1,l)
+        print '\t * chi2_l = ',dot(a.X2,l)
 
     #
-    m1,m2 = a.m1,a.m2 
+    m1,m2 = [ k/(a.m1+a.m2) for k in (a.m1,a.m2) ] 
     eta = m1*m2/(m1+m2)
-
-    #
-    if 'th' in file_name:
-        foo = file_name.split('th')[-1]
-    else:
-        foo = file_name.split('Dit')[0]
-        foo = foo.split('t')[-1]
-        foo = foo.lower().split('d')[0]
-        foo = foo.split('_')[0]
-    #
-    theta = int(foo)
     
     #
-    X1,X2,L = a.X1,a.X2,a.L
+    X1,X2,L,S = a.X1,a.X2,a.L,a.S
     
     #
-    chi1 = norm(X1)
-    chi2 = norm(X2)
-    if abs(m1-m2)<1e-4:
-        if (chi1<1e-4) and (chi2>1e-4):
-            chi2 = 0
-            chi1 = chi2
-            X1,X2 = [ array(k) for k in (X2,X1) ]
-            m1=m2=0.5
+    l = L/norm(L)
+    s = S/norm(S)
+    
+    #
+    theta = arccos( dot( l, s ) ) * 180/pi
+    
+    #
+    chi1 = dot(X1,l)
+    chi2 = dot(X2,l)
     
     #
     chi_p   = calc_chi_p(   m1,X1, m2,X2, L )
@@ -74,6 +70,8 @@ for f in files:
     #
     simnames.append(file_name)
     metadata.append( [ theta,
+                       m1,
+                       m2,
                        eta,
                        delta,
                        chi_eff,
@@ -88,7 +86,7 @@ print 'Done.'
 metadata_array = array(metadata)
 
 #
-keys = [ 'theta', 'eta', 'delta', 'chi_eff', 'chi_p', 'chi1', 'chi2' ]
+keys = [ 'theta', 'm1', 'm2', 'eta', 'delta', 'chi_eff', 'chi_p', 'chi1', 'chi2' ]
 
 #
 metadata_dict = {}
