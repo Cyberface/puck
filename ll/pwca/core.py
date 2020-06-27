@@ -69,7 +69,7 @@ def select_scenty_metadata( sceo ):
     
     #
     from numpy.linalg import norm
-    from numpy import arccos,dot,pi
+    from numpy import arccos,dot,pi,array
     from positive.physics import calc_chi_eff,calc_chi_p
     
     #

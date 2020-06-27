@@ -69,8 +69,8 @@ for k in range(len(data)):
     axvline( fmin, color='k', ls=':',lw=1 )
     axvline( fmax, color='k', ls=':',lw=1 )
     
-    fmin_new = exp(x[knot]) * 0.325
-    fmax_new = exp(x[knot]) + 0.025 # * 1.315
+    fmin_new = exp(x[knot]) * 0.4
+    fmax_new = exp(x[knot]) + 0.020 # * 1.315
     axvline( fmin_new, color='b', ls='--',lw=2 )
     axvline( fmax_new, color='b', ls='--',lw=2 )
 
