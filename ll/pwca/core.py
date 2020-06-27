@@ -3,7 +3,7 @@
 #
 import pickle
 from positive import alert,magenta
-from numpy import load
+from numpy import loadtxt,load
 from os.path import exists
 
 # Always load catalog list for calibration runs 
@@ -15,6 +15,9 @@ alert('Catalog of calibration runs stored to %s'%magenta('"pwca.pwca_catalog"'),
 metadata_dict_path = '/Users/book/KOALA/puck/ll/data/metadata_dict.pickle'
 metadata_dict = load(metadata_dict_path)
 alert('Metadata dictionary for calibration runs stored to %s'%magenta('"pwca.metadata_dict"'),fname='pwca.core')
+
+#
+
 
 # Function to determine version2 data fitting region
 def determine_data_fitting_region( data, fmin=0.03, fmax=0.12 ):
@@ -55,3 +58,53 @@ def determine_data_fitting_region( data, fmin=0.03, fmax=0.12 ):
     
     #
     return new_data,new_knot,new_fmin,new_fmax,f_knot
+    
+
+#
+def select_scenty_metadata( sceo ):
+    
+    '''
+    Given nrutils' scentry object, collect metedata useful for generating model waveforms 
+    '''
+    
+    #
+    from numpy.linalg import norm
+    from numpy import arccos,dot,pi
+    from positive.physics import calc_chi_eff,calc_chi_p
+    
+    #
+    a = sceo
+    
+    #
+    l = a.L/norm(a.L)
+    if (abs(a.m1-a.m2)<1e-3) and (norm(a.X1)<norm(a.X2)):
+        a.X1,a.X2 = [ array(k) for k in (a.X2,a.X1) ]
+        a.m1,a.m2 = [ float(k) for k in (a.m2,a.m1) ]
+
+    #
+    m1,m2 = [ k/(a.m1+a.m2) for k in (a.m1,a.m2) ] 
+    eta = m1*m2/(m1+m2)
+    
+    #
+    X1,X2,L,S = a.X1,a.X2,a.L,a.S
+    
+    #
+    l = L/norm(L)
+    s = S/norm(S)
+    
+    #
+    theta = arccos( dot( l, s ) ) * 180/pi
+    
+    #
+    chi1 = dot(X1,l)
+    chi2 = dot(X2,l)
+    
+    #
+    chi_p   = calc_chi_p(   m1,X1, m2,X2, L )
+    chi_eff = calc_chi_eff( m1,X1, m2,X2, L )
+    
+    #
+    delta = (m1-m2)/(m1+m2)
+    
+    #
+    return theta,m1,m2,eta,delta,chi_eff,chi_p,chi1,chi2 

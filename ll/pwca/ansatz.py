@@ -80,7 +80,7 @@ def template_dphi_mrd( m1, m2, chi1, chi2, chip ):
     """
     
     #
-    from numpy import exp,sqrt,pi
+    from numpy import exp,sqrt,pi,ndarray
     import pwca, phenom
     
     #
@@ -148,7 +148,7 @@ def template_dphi_mrd( m1, m2, chi1, chi2, chip ):
         template_dphi *= -1.0/eta
         
         #
-        return template_dphi-min(template_dphi)
+        return template_dphi-min(template_dphi[(f>0.03)*f<(0.12)]) if isinstance(f,ndarray) else template_dphi
 
     #
     return template
