@@ -36,6 +36,8 @@ mu1, mu2, mu3, mu4 = amp_range.T
 
 #
 foo = {}
+foo['model_domain_header'] = '# columns are: cos(theta), eta, chi_eff, chi_p '
+foo['model_domain'] = model_domain
 
 # --------------------------------------- #
 # Fit dphase parameters 
