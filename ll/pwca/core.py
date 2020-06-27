@@ -38,15 +38,17 @@ def determine_data_fitting_region( data, fmin=0.03, fmax=0.12 ):
     x = log(f[mask])
     y = smooth(dphi_td[mask]).answer
     knot = argmin(y)
+    y_knot = y[knot]
     
     # Determine new fmin and max using heuristic 
     f_knot = f[mask][knot]
-    new_fmin = f_knot * 0.325
-    new_fmax = f_knot + 0.025 
+    new_fmin = f_knot * 0.4# 0.325
+    new_fmax = f_knot + 0.020 # 0.025 
     
     #
     new_mask = (f>=new_fmin) & (f<=new_fmax)
     new_data = data.T[new_mask,:]
+    new_data[:,-2:] -= y_knot
     
     #
     new_knot = find(f>=fmin)[0]+knot

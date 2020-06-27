@@ -10,7 +10,7 @@ def template_amp_mrd( m1, m2, chi1, chi2, chip ):
     """
     
     #
-    from numpy import exp,sqrt,pi
+    from numpy import exp,sqrt,pi,log
     import pwca, phenom
     
     #
@@ -33,7 +33,7 @@ def template_amp_mrd( m1, m2, chi1, chi2, chip ):
     amp0 = (sqrt(2.0/3.0)*sqrt(eta)) / pi**(1.0/6.0)
     
     #
-    def template(f, mu1=0, mu2=0, mu3=0, mu4=0, include_pn_factor=True):
+    def template(f, mu1=0, mu2=0, mu3=0, mu4=0):
         '''
         f:      frequency (code units)
         mu1:    parameter modifying PhenomD gamma1
@@ -45,25 +45,27 @@ def template_amp_mrd( m1, m2, chi1, chi2, chip ):
         # Define new paremeters
         new_gamma1 = gamma1 + ( chip * mu1 )
         new_gamma2 = gamma2 + ( chip * mu2 )
-        new_gamma3 = gamma3 + ( chip * mu3 )
-        new_dfring = f - ( fring + chip*mu4 )
+        new_gamma3 = gamma3
+        new_fdamp = fdamp + chip*mu3
+        new_fring = fring + chip*mu4
+        new_dfring = f - new_fring
 
         #
-        new_gamma3_fdamp = new_gamma3 * fdamp
+        new_gamma3_fdamp = new_gamma3 * new_fdamp
 
         #
         part1 = new_gamma1 * new_gamma3_fdamp / ( new_dfring**2 + new_gamma3_fdamp**2 )
-        part2 = exp(  - new_gamma2 * new_dfring / (new_gamma3*fdamp)  )
+        part2 = exp(  - new_gamma2 * new_dfring / (new_gamma3_fdamp)  )
 
         #
         template_amplitude = part1 * part2
         
         #
-        if include_pn_factor:
-            template_amplitude = template_amplitude*(sqrt(2.0/3.0)*sqrt(eta)) / pi**(1.0/6.0)*(f**(-7.0/6))
+        template_amplitude = template_amplitude*(sqrt(2.0/3.0)*sqrt(eta)) / pi**(1.0/6.0)
+        # template_amplitude = template_amplitude*(sqrt(2.0/3.0)*sqrt(eta)) / pi**(1.0/6.0)*(f**(-7.0/6))
 
         #
-        return template_amplitude
+        return log( template_amplitude )
 
     #
     return template
@@ -100,7 +102,8 @@ def template_dphi_mrd( m1, m2, chi1, chi2, chip ):
     fdamp = phenom.remnant.fdamp(eta,chi1,chi2,final_spin)
     
     #
-    def template(f, nu1=0, nu2=0, nu3=0, nu4=0, nu5=0, nu6=0, include_pn_factor=True):
+    #def template(f, nu1=0, nu2=0, nu3=0, nu4=0, nu5=0, nu6=0):
+    def template(f, nu4=0, nu5=0, nu6=0):
         '''
         f:      frequency (code units)
         nu1:    parameter modifying PhenomD alpha1
@@ -110,15 +113,31 @@ def template_dphi_mrd( m1, m2, chi1, chi2, chip ):
         nu5:    parameter modifying PhenomD alpha5
         nu6:    parameter modifying PhenomD ringdown fdamp
         '''
+        
+        #
+        nu1 = 0
+        nu2 = 0
+        nu3 = 0
+        #nu4 = 0
+        #nu5 = 0
+        #nu6 = 0
 
-        # Define new paremeters
+        # Define new paremeters -- Late inspiral, Plunge
         new_alpha1 = alpha1 + ( chip * nu1 )
         new_alpha2 = alpha2 + ( chip * nu2 )
         new_alpha3 = alpha3 + ( chip * nu3 )
+        
+        # #Define new paremeters --  Merger
+        # new_alpha4 = alpha4 + ( chip * nu4 )
+        # new_alpha5 = alpha5 + ( chip * nu5 )
+        # new_dfring = f - new_alpha5*fring
+        # new_fdamp = fdamp + chip*nu6
+        
+        #Define new paremeters --  Merger
         new_alpha4 = alpha4 + ( chip * nu4 )
-        new_alpha5 = alpha5 + ( chip * nu5 )
-        new_dfring = f - new_alpha5*fring
+        new_fring = fring + chip*nu5
         new_fdamp = fdamp + chip*nu6
+        new_dfring = f - alpha5*new_fring
 
         #
         part1 = new_alpha1 + new_alpha2*f**(-2.0) + new_alpha3*f**(-0.25) 
@@ -129,11 +148,7 @@ def template_dphi_mrd( m1, m2, chi1, chi2, chip ):
         template_dphi *= -1.0/eta
         
         #
-        # if not include_pn_factor:
-        #     template_dphi /= eta
-        
-        #
-        return template_dphi
+        return template_dphi-min(template_dphi)
 
     #
     return template
