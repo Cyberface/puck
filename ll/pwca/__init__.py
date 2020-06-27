@@ -11,6 +11,8 @@ alert(yellow('Warm greetings from Welsh Puck (aka pwca)')+'.',fname='init')
 from . import ansatz
 from . import core
 from . import d
+from . import parameter_space_fits
 from . d import *
 from . ansatz import *
 from . core import *
+from . parameter_space_fits import *
