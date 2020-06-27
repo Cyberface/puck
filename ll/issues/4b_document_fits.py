@@ -41,7 +41,7 @@ for k in foo:
 
 #
 code_string = ['\n\n#\ndef generate_model_params(theta,eta,chi_eff,chi_p):\n\n',
-               '\t\'\'\'\n\tHola, soy un codigo escribido por codigo. ~londonl@mit.edu/pilondon2@gmail.com 2020\n\t\'\'\'  \n\n',
+               '\t\'\'\'\n\tHola, soy un codigo escribido por codigo. \n\t~londonl@mit.edu/pilondon2@gmail.com 2020\n\t\'\'\'  \n\n',
                '\t# Import usefuls\n',
                '\tfrom numpy import cos\n\n',
                '\t# Preliminaries\n',
@@ -63,6 +63,7 @@ for k in fit_var:
 
     #
     this_code_string = foo[k].__str_python__()
+    this_code_string = this_code_string.replace('lambda u,eta,chi_eff,chi_p: ','')
     this_code_string = this_code_string.replace('chi_p*chi_p','chi_p2')
     this_code_string = this_code_string.replace('chi_p2*chi_p','chi_p3')
     this_code_string = this_code_string.replace('u*u','u2')
@@ -80,7 +81,8 @@ code_string.append( '\t#\n' )
 code_string.append( '\treturn %s\n'%(','.join(fit_var)) )
 
 # Write fit equations to file 
-code_path = datadir+'parameter_space_fits.py'
+codedir = '/Users/book/KOALA/puck/ll/pwca/'
+code_path = codedir+'parameter_space_fits.py'
 alert('Write fit equations to file at %s'%magenta(code_path))
 f = open(code_path,'w+')
 f.writelines(code_string)
