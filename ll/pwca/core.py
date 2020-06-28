@@ -109,3 +109,43 @@ def select_scenty_metadata( sceo ):
     
     #
     return theta,m1,m2,eta,delta,chi_eff,chi_p,chi1,chi2,a1,a2 
+    
+# Given underlying physical parameters, calculate ones useful form modeling
+def parama_party( eta,theta,a1 ):
+    '''
+    PARAMA-PARTY:
+    If L || z and m1>m2 and q=m1/m2, then 
+
+    S2 = 0
+    S1 = m1**2 a1 * exp( 1j * theta ) = Sz + 1j*Sperp
+    X1 = X = S1/m1**2
+
+    chi_eff = m1*a1*cos(theta)/(m1+m2) = a1*cos(theta)*/(1+1.0/q)
+
+    A1 = 2 + (3*m2)/(2*m1)
+    A2 = 2 + (3*m1)/(2*m2)
+    B1 = A1 * a1*sin(theta)
+    B2 = 0
+    chi_p = max( B1,B2 ) / ( A1 * m1*m1 )
+    L = L
+
+    '''
+    
+    #
+    from positive import eta2m1m2
+    from numpy import cos,sin,maximum
+    
+    #
+    m1,m2 = eta2m1m2(eta)
+    
+    #
+    q = m1/m2
+    chi_eff = m1*a1*cos(theta)/(m1+m2)
+    
+    #
+    A1 = 2 + (3.0*m2)/(2.0*m1)
+    B1 = A1 * abs(a1*sin(theta)*m1*m1)
+    chi_p = maximum( B1,0 ) / ( A1 * m1*m1 )
+    
+    #
+    return chi_eff, chi_p
