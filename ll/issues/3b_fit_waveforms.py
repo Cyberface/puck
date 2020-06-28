@@ -34,7 +34,7 @@ amp_popt_array = zeros( (len(files), 4) )
 dphi_popt_array = zeros( (len(files),3) )
 amp_pcov_list = []
 dphi_pcov_list = []
-physical_param_array = zeros( (len(files), 9) )
+physical_param_array = zeros( (len(files), 11) )
 alert('Plotting ...')
 for j,f_ in enumerate(files):
 
@@ -53,7 +53,7 @@ for j,f_ in enumerate(files):
     
     #
     f,amp_td,amp_fd,dphi_td,dphi_fd = data.T
-    theta,m1,m2,eta,delta,chi_eff,chi_p,chi1,chi2 = metadata_dict['array_data'][k]
+    theta,m1,m2,eta,delta,chi_eff,chi_p,chi1,chi2,a1,a2 = metadata_dict['array_data'][k]
     
     #
     physical_param_array[j,:] = metadata_dict['array_data'][k]
@@ -81,14 +81,14 @@ for j,f_ in enumerate(files):
     inv_amp_scale = f ** (-7.0/6)
     
     #
-    log_template_amp = pwca.ansatz.template_amp_mrd(m1, m2, chi1, chi2, chi_p)
-    phenomd_amp = exp( log_template_amp(f) ) * inv_amp_scale
+    template_amp = pwca.ansatz.template_amp_mrd(m1, m2, chi1, chi2, chi_p)
+    phenomd_amp = template_amp(f) * inv_amp_scale
     
     #
-    scaled_amp_fd = amp_fd * amp_scale
-    log_scaled_amp_fd = log(scaled_amp_fd)
+    log_scaled_amp_fd = log( amp_fd * amp_scale )
+    log_template_amp = lambda F,*args: log( template_amp(F,*args) )
     amp_popt, amp_pcov = curve_fit(log_template_amp, f, log_scaled_amp_fd,p0=[0,0,0,0])
-    best_fit_amp = exp(log_template_amp(f,*amp_popt)) * inv_amp_scale
+    best_fit_amp = template_amp(f,*amp_popt) * inv_amp_scale
     
     #
     amp_popt_array[j,:] = amp_popt
@@ -138,12 +138,12 @@ savefig(file_path,pad_inches=2, bbox_inches = "tight")
 # Initial binary parameters
 data_path = datadir+'fit_intial_binary_parameters.txt'
 alert('Saving %s to %s'%( magenta('physical_param_array'), magenta(data_path)) )
-savetxt( data_path, physical_param_array, header='see "issues/3_collect_metadata.py"; columns are theta, m1, m2, eta, delta, chi_eff, chi_p, chi1, chi2' )
+savetxt( data_path, physical_param_array, header='see "issues/3_collect_metadata.py"; columns are theta, m1, m2, eta, delta, chi_eff, chi_p, chi1, chi2, a1, a2' )
 
 # Amplitude fit parameters
 data_path = datadir+'fit_opt_amplitude_parameters.txt'
 alert('Saving %s to %s'%( magenta('amp_popt_array'), magenta(data_path)) )
-savetxt( data_path, amp_popt_array, header='see "template_amp_mrd()" in ansatz.py; columns are mu1, mu2, mu3, mu4' )
+savetxt( data_path, amp_popt_array, header='see "template_amp_mrd()" in ansatz.py; columns are mu1, mu2, mu4' )
 
 # Phase derivative fit parameters
 data_path = datadir+'fit_opt_dphase_parameters.txt'

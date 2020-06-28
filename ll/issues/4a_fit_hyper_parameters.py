@@ -19,7 +19,7 @@ datadir = '/Users/book/KOALA/puck/ll/data/version2/'
 
 # Load and unpuack physical parameter space
 raw_domain = loadtxt(datadir+'fit_intial_binary_parameters.txt')
-theta,m1,m2,eta,delta,chi_eff,chi_p,chi1,chi2 = raw_domain.T
+theta,m1,m2,eta,delta,chi_eff,chi_p,chi1,chi2,a1,a2 = raw_domain.T
 
 
 # Define desired model domain variables and array 
@@ -46,11 +46,11 @@ foo['model_domain'] = model_domain
 alert('Fitting dphase parameters ...')
 
 # nu4
-foo['nu4'] = gmvpfit( model_domain, nu4,fitatol=0.002,verbose=True,maxdeg_list=[3,2,1,1],center=True)
+foo['nu4'] = gmvpfit( model_domain, nu4,fitatol=0.005,verbose=True,maxdeg_list=[2,3,1,2],center=True)
 # nu5
-foo['nu5'] = gmvpfit( model_domain, nu5,fitatol=0.002,verbose=True,maxdeg_list=[3,3,1,1],center=True)
+foo['nu5'] = gmvpfit( model_domain, nu5,fitatol=0.002,verbose=True,maxdeg_list=[2,2,2,2],center=True)
 # nu6
-foo['nu6'] = gmvpfit( model_domain, nu6,fitatol=0.002,verbose=True,maxdeg_list=[3,3,1,1],center=False)
+foo['nu6'] = gmvpfit( model_domain, nu6,fitatol=0.002,verbose=True,maxdeg_list=[2,2,2,1],center=True)
 
 # --------------------------------------- #
 # Fit amplitude parameters 
@@ -59,13 +59,13 @@ foo['nu6'] = gmvpfit( model_domain, nu6,fitatol=0.002,verbose=True,maxdeg_list=[
 alert('Fitting amplitude parameters ...')
 
 # mu1 
-foo['mu1'] = gmvpfit( model_domain, mu1,fitatol=0.004,verbose=True,maxdeg_list=[2,3,1,2],center=False,temper=False)
+foo['mu1'] = gmvpfit( model_domain, mu1,fitatol=0.002,verbose=True,maxdeg_list=[2,2,1,1],center=True)
 # mu2
 foo['mu2'] = gmvpfit( model_domain, mu2,fitatol=0.004,verbose=True,maxdeg_list=[2,2,2,2],center=True)
 # mu3
-foo['mu3'] = gmvpfit( model_domain, mu3,fitatol=0.004,verbose=True,maxdeg_list=[2,2,2,2],center=True)
+foo['mu3'] = gmvpfit( model_domain, mu3,fitatol=0.001,verbose=True,maxdeg_list=[2,2,2,2],center=True,temper=True)
 # mu4
-foo['mu4'] = gmvpfit( model_domain, mu4,fitatol=0.004,verbose=True,maxdeg_list=[2,2,2,2],center=False)
+foo['mu4'] = gmvpfit( model_domain, mu4,fitatol=0.004,verbose=True,maxdeg_list=[2,2,2,2],center=True)
 
 # --------------------------------------- #
 # Saving fit data

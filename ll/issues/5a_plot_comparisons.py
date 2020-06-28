@@ -53,7 +53,7 @@ for a in pwca_catalog:
     opt_mu1, opt_mu2, opt_mu3, opt_mu4 = amp_range[k,:]
 
     # extract useful params from scentry object
-    theta,m1,m2,eta,delta,chi_eff,chi_p,chi1,chi2 = select_scenty_metadata(a)
+    theta,m1,m2,eta,delta,chi_eff,chi_p,chi1,chi2,a1,a2 = select_scenty_metadata(a)
     # generate model parameters 
     mu1,mu2,mu3,mu4,nu4,nu5,nu6 = generate_model_params(theta,eta,chi_eff,chi_p)
 
@@ -63,7 +63,7 @@ for a in pwca_catalog:
 
     # Load and unpuack physical parameter space
     raw_domain = loadtxt(datadir+'fit_intial_binary_parameters.txt')
-    param_test_quantity = sum(raw_domain[k,:]-array([theta,m1,m2,eta,delta,chi_eff,chi_p,chi1,chi2]))==0
+    param_test_quantity = sum(raw_domain[k,:]-array([theta,m1,m2,eta,delta,chi_eff,chi_p,chi1,chi2,a1,a2]))==0
     if param_test_quantity:
         alert(bold(green('CHECK PASSED: '))+'Generated physical parameters are identical to calibration ones.')
     else:
@@ -85,9 +85,9 @@ for a in pwca_catalog:
 
     # Prepare amplitude data
     scale_factor = raw_fp ** (-7.0/6.0)
-    phenomd_amp   = exp( template_amp( raw_fp ) ) * scale_factor
-    opt_model_amp = exp( template_amp( raw_fp, opt_mu1, opt_mu2, opt_mu3, opt_mu4 ) ) * scale_factor
-    model_amp     = exp( template_amp( raw_fp, mu1, mu2, mu3, mu4 ) ) * scale_factor
+    phenomd_amp   = template_amp( raw_fp ) * scale_factor
+    opt_model_amp = template_amp( raw_fp, opt_mu1, opt_mu2, opt_mu3, opt_mu4 ) * scale_factor
+    model_amp     = template_amp( raw_fp, mu1, mu2, mu3, mu4 ) * scale_factor
 
     # Plot phase derivative 
     # ---

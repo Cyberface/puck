@@ -16,8 +16,6 @@ metadata_dict_path = '/Users/book/KOALA/puck/ll/data/metadata_dict.pickle'
 metadata_dict = load(metadata_dict_path)
 alert('Metadata dictionary for calibration runs stored to %s'%magenta('"pwca.metadata_dict"'),fname='pwca.core')
 
-#
-
 
 # Function to determine version2 data fitting region
 def determine_data_fitting_region( data, fmin=0.03, fmax=0.12 ):
@@ -45,7 +43,7 @@ def determine_data_fitting_region( data, fmin=0.03, fmax=0.12 ):
     
     # Determine new fmin and max using heuristic 
     f_knot = f[mask][knot]
-    new_fmin = f_knot * 0.4# 0.325
+    new_fmin = f_knot * 0.5# 0.325
     new_fmax = f_knot + 0.020 # 0.025 
     
     #
@@ -89,11 +87,14 @@ def select_scenty_metadata( sceo ):
     X1,X2,L,S = a.X1,a.X2,a.L,a.S
     
     #
+    a1,a2 = norm(a.X1),norm(a.X2)
+    
+    #
     l = L/norm(L)
     s = S/norm(S)
     
-    #
-    theta = arccos( dot( l, s ) ) * 180/pi
+    # NOTE that theta is in radians
+    theta = arccos( dot( l, s ) ) 
     
     #
     chi1 = dot(X1,l)
@@ -107,4 +108,4 @@ def select_scenty_metadata( sceo ):
     delta = (m1-m2)/(m1+m2)
     
     #
-    return theta,m1,m2,eta,delta,chi_eff,chi_p,chi1,chi2 
+    return theta,m1,m2,eta,delta,chi_eff,chi_p,chi1,chi2,a1,a2 

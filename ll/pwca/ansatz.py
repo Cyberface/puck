@@ -65,7 +65,7 @@ def template_amp_mrd( m1, m2, chi1, chi2, chip ):
         # template_amplitude = template_amplitude*(sqrt(2.0/3.0)*sqrt(eta)) / pi**(1.0/6.0)*(f**(-7.0/6))
 
         #
-        return log( template_amplitude )
+        return template_amplitude
 
     #
     return template

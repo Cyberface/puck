@@ -50,11 +50,14 @@ for f in files:
     X1,X2,L,S = a.X1,a.X2,a.L,a.S
     
     #
+    a1,a2 = norm(a.X1),norm(a.X2)
+    
+    #
     l = L/norm(L)
     s = S/norm(S)
     
-    #
-    theta = arccos( dot( l, s ) ) * 180/pi
+    # NOTE that theta is in radians
+    theta = arccos( dot( l, s ) ) 
     
     #
     chi1 = dot(X1,l)
@@ -77,7 +80,9 @@ for f in files:
                        chi_eff,
                        chi_p,
                        chi1,
-                       chi2 ] )
+                       chi2,
+                       a1,
+                       a2 ] )
 
 #
 print 'Done.'
