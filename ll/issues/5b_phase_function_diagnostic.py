@@ -115,7 +115,7 @@ for a in pwca_catalog:
     
     #
     legend(ncol=2,loc=1)
-    ylabel(r'$|\tilde{h}_{22}(f)|$')
+    ylabel(r'$\frac{d}{df}\arg(\tilde{h}_{22})$')
     if (ax_id==len(pwca_catalog)) or (ax_id==1):
         xlabel('$fM$')
     title(a.simname,loc='left',size=12)

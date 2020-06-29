@@ -18,7 +18,7 @@ package_dir = parent( pwca.__path__[0] )
 datadir = package_dir + 'data/version2/'
 
 #
-files = glob( datadir+'*.txt' )
+files = glob( datadir+'q*.txt' )
 
 #
 data = []
@@ -79,14 +79,14 @@ for k in range(len(data)):
     axvline( fmin, color='k', ls=':',lw=1 )
     axvline( fmax, color='k', ls=':',lw=1 )
     
-    fmin_new = exp(x[knot]) * 0.325
-    fmax_new = exp(x[knot]) + 0.025 # * 1.315
+    fmin_new = exp(x[knot]) * 0.5
+    fmax_new = exp(x[knot]) + 0.020 # * 1.315
     axvline( fmin_new, color='b', ls='--',lw=2 )
     axvline( fmax_new, color='b', ls='--',lw=2 )
     
     #
     legend(ncol=2,loc=3)
-    ylabel(r'$|\tilde{h}_{22}(f)|$')
+    ylabel(r'$\frac{d}{df}\arg(\tilde{h}_{22})$')
     if k+1!=len(data):
         xticks([])
     else:

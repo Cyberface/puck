@@ -113,7 +113,7 @@ for a in pwca_catalog:
     axvspan( fmax, max(xlim()), alpha=0.05, color='k')
     legend()
 
-    ylabel(r'$|\tilde{h}_{22}(f)|$')
+    ylabel(r'$\frac{d}{df}\arg(\tilde{h}_{22})$')
     xlabel('$fM$')
     title(a.simname,loc='left',size=12)
 
