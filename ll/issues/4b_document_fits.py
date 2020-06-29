@@ -67,7 +67,7 @@ fit_object = { k:foo[k] for k in foo if ('nu' in k) or ('mu' in k) }
 for key in fit_object:
     
     # Summary figure for internal diagnostics 
-    fit_object[key].labels=labels={'python':[key,('u', 'eta', 'a1'),''],'latex':['\\'+key,(r'\cos(\theta)', r'\eta', r'a_1'),'']}
+    fit_object[key].labels={'python':[key,('u', 'eta', 'a1'),''],'latex':['\\'+key,(r'\cos(\theta)', r'\eta', r'a_1'),'']}
     
     # Generate diagnostic figures
     summary_fig,eta_set_fig,theta_set_fig = advanced_gmvx_plot( fit_object[key] )

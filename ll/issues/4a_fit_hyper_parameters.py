@@ -58,7 +58,7 @@ foo['model_domain'] = model_domain
 alert('Fitting dphase parameters ...',header=True)
 
 # nu4
-foo['nu4'] = gmvpfit( model_domain, nu4,fitatol=0.001,verbose=True,maxdeg_list=[4,3,1],center=True)
+foo['nu4'] = gmvpfit( model_domain, nu4,fitatol=0.001,verbose=True,maxdeg_list=[4,3,1],center=True,temper=False)
 # nu5
 foo['nu5'] = gmvrfit( model_domain, nu5,fitatol=0.001,verbose=True,maxdeg_list=[4,3,1],center=True)
 foo['nu5'].range = foo['nu5'].scalar_range
