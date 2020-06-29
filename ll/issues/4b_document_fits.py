@@ -70,103 +70,21 @@ for key in fit_object:
     
     # Generate diagnostic figures
     summary_fig,eta_set_fig,theta_set_fig = advanced_gmvx_plot( fit_object[key] )
-    
-    # summary_fig = fit_object[key].plot(size_scale=1.5)
-    # ax = summary_fig.axes
-
-    # #
-    # sca(ax[0])
-    # title(key)
-                                                                        
-    # #
-    # for _a1 in a1_set:
-    #     for _theta in theta_set:
-
-    #         #
-    #         theta_mask = (_theta==theta_point)
-    #         a1_mask = (_a1==a1_point)
-    #         mask = a1_mask & theta_mask
-
-    #         #
-    #         _eta = eta_point[mask]
-    #         _u = cos(_theta) 
-
-    #         #
-    #         case_eta   = linspace( min(_eta),max(_eta),1000 ) # 
-    #         case_theta = _theta * ones_like(case_eta)
-    #         case_u     = cos(case_theta)
-    #         case_a1    = _a1    * ones_like(case_eta)
-
-    #         #
-    #         case_chi_eff, case_chi_p = parama_party( case_eta,case_theta,case_a1 )
-
-    #         #
-    #         case_domain = array([case_u,case_eta,case_chi_eff,case_chi_p]).T
-    #         case_range = fit_object[key].eval(case_domain)
-    #         opt_range  = fit_object[key].eval(fit_object[key].domain[mask,:])
-
-    #         #
-    #         sca(ax[0])
-    #         ax[0].plot3D( case_u, case_eta, case_range, lw=1, alpha=1 )
-    
-
-    # #
-    # for _a1 in a1_set:
-    #     for _eta in eta_set:
-
-    #         #
-    #         eta_mask = (_eta==eta_point)
-    #         a1_mask = (_a1==a1_point)
-    #         mask = a1_mask & eta_mask
-
-    #         #
-    #         _theta = theta_point[mask]
-    #         _u = cos(_theta) 
-
-    #         #
-    #         case_theta   = linspace( min(_theta),max(_theta),1000 ) # 
-    #         case_u     = cos(case_theta)
-    #         case_eta   = _eta * ones_like(case_theta)
-    #         case_a1    = _a1  * ones_like(case_theta)
-
-    #         #
-    #         case_chi_eff, case_chi_p = parama_party( case_eta,case_theta,case_a1 )
-
-    #         #
-    #         case_domain = array([case_u,case_eta,case_chi_eff,case_chi_p]).T
-    #         case_range = fit_object[key].eval(case_domain)
-    #         opt_range  = fit_object[key].eval(fit_object[key].domain[mask,:])
-
-    #         #
-    #         sca(ax[0])
-    #         ax[0].plot3D( case_u, case_eta, case_range, lw=1, alpha=1 )
             
     # Save summary figure
     figure_path = datadir + key+'_fit_diagnostic_1_summary.pdf'
     alert('Saving diagnostic plot to %s'%magenta(figure_path))
-    summary_fig.savefig( figure_path, pad_inches=0 )
+    summary_fig.savefig( figure_path, pad_inches=0, bbox_inches = 'tight' )
     
     # Save eta space figure
     figure_path = datadir + key+'_fit_diagnostic_2_eta_sets.pdf'
     alert('Saving diagnostic plot to %s'%magenta(figure_path))
-    eta_set_fig.savefig( figure_path, pad_inches=0 )
+    eta_set_fig.savefig( figure_path, pad_inches=0, bbox_inches = 'tight' )
     
     # Save theta space figure
     figure_path = datadir + key+'_fit_diagnostic_3_theta_sets.pdf'
     alert('Saving diagnostic plot to %s'%magenta(figure_path))
-    theta_set_fig.savefig( figure_path, pad_inches=0 )
-            
-
-# alert('Generate and save diagnostic plots ...')
-# for k in foo:
-#     if ('mu' in k)or('nu' in k):
-#         # Generate plot
-#         labels={'python':[k,('u', 'eta', 'chi_eff', 'chi_p'),''],'latex':[k,(r'\cos(\theta)', r'\eta', r'\chi_s', r'\chi_p'),'']}
-#         fig = foo[k].plot(labels=labels,size_scale=1.2)
-#         # Save figure 
-#         figure_path = datadir + k+'_fit_diagnostic.pdf'
-#         alert('Saving diagnostic plot to %s'%magenta(figure_path))
-#         savefig( figure_path, pad_inches=0 )
+    theta_set_fig.savefig( figure_path, pad_inches=0, bbox_inches = 'tight' )
     
    
 # --------------------------------------- #
