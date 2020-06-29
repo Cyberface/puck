@@ -28,7 +28,7 @@ fig,ax = subplots( len(simnames), 1, figsize = 16*array([ 1, len(simnames)*0.618
 ax = ax.flatten()
 
 #
-tight_layout(1,1,12)
+tight_layout(1,2,1)
 
 # Plot diagnostics for all calibration cases
 ax_id = 0
