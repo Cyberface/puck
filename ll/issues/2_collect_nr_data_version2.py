@@ -21,12 +21,14 @@ from glob import glob
 import h5py
 from os import path
 import pickle
+import pwca
 
 # Preliminaries 
 # --
 
 # Define path for file IO
-data_dir = '/Users/book/KOALA/puck/ll/data/version2/'
+package_dir = parent( pwca.__path__[0] )
+data_dir = package_dir + 'data/version2/'
 mkdir(data_dir,verbose=True)
 
 # Find and load data

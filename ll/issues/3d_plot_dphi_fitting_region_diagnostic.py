@@ -7,13 +7,17 @@ from positive import *
 from nrutils import scsearch, gwylm
 from glob import glob
 from pwca import determine_data_fitting_region
+import pwca
 
 
 # Preliminaries
 # --
 
+# Define data location
+package_dir = parent( pwca.__path__[0] )
+datadir = package_dir + 'data/version2/'
+
 #
-datadir = '/Users/book/KOALA/puck/ll/data/version2/'
 files = glob( datadir+'*.txt' )
 
 #

@@ -15,12 +15,13 @@ from pwca import determine_data_fitting_region,pwca_catalog,metadata_dict,parama
 
 #Load parameter space fit data
 alert('Loading parameter space fit data.')
-datadir = '/Users/book/KOALA/puck/ll/data/version2/'
+package_dir = parent( pwca.__path__[0] )
+datadir = package_dir + 'data/version2/'
 foo_path = datadir+'parameter_space_fits.pickle'
 foo = pickle.load( open( foo_path, "rb" ) )
 
 # Load and unpuack physical parameter space
-raw_domain = loadtxt('/Users/book/KOALA/puck/ll/data/version2/fit_intial_binary_parameters.txt')
+raw_domain = loadtxt(datadir+'fit_intial_binary_parameters.txt')
 theta,m1,m2,eta,delta,chi_eff,chi_p,chi1,chi2,a1,a2 = raw_domain.T
 
 
@@ -31,11 +32,11 @@ q = 1.0/eta2q(eta)
 model_domain = array( [ u, q, chi_eff, chi_p ] ).T
 
 # Load and unpuack physical parameter space -- dphi
-dphi_range = loadtxt('/Users/book/KOALA/puck/ll/data/version2/fit_opt_dphase_parameters.txt')
+dphi_range = loadtxt(datadir+'fit_opt_dphase_parameters.txt')
 nu4,nu5,nu6 = dphi_range.T
 
 # Load and unpuack physical parameter space -- amp
-amp_range = loadtxt('/Users/book/KOALA/puck/ll/data/version2/fit_opt_amplitude_parameters.txt')
+amp_range = loadtxt(datadir+'fit_opt_amplitude_parameters.txt')
 mu1, mu2, mu3, mu4 = amp_range.T
 
 # --------------------------------------- #
@@ -131,7 +132,7 @@ code_string.append( '\t#\n' )
 code_string.append( '\treturn %s\n'%(','.join(fit_var)) )
 
 # Write fit equations to file 
-codedir = '/Users/book/KOALA/puck/ll/pwca/'
+codedir = package_dir+'pwca/'
 code_path = codedir+'parameter_space_fits.py'
 alert('Write fit equations to file at %s'%magenta(code_path))
 f = open(code_path,'w+')

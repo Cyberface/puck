@@ -8,9 +8,11 @@ from glob import glob
 from numpy.linalg import norm
 from pwca import determine_data_fitting_region,pwca_catalog
 import pickle
+import pwca
 
 #
-datadir = '/Users/book/KOALA/puck/ll/data/version2/'
+package_dir = parent( pwca.__path__[0] )
+data_dir = package_dir + 'data/version2/'
 files = glob( datadir+'q*.txt' )
 
 #

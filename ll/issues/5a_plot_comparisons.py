@@ -7,6 +7,14 @@ from positive import *
 from nrutils import scsearch, gwylm
 from pwca import *
 from glob import glob
+import pwca
+
+#
+package_dir = parent( pwca.__path__[0] )
+data_dir = package_dir + 'data/'
+
+# Define data location
+datadir = data_dir+'version2/'
 
 # Display basic info about calibration runs
 scsearch( catalog=pwca_catalog, verbose=True )
@@ -14,9 +22,6 @@ scsearch( catalog=pwca_catalog, verbose=True )
 
 # Preliminaries 
 # ---
-
-# Define data location
-datadir = '/Users/book/KOALA/puck/ll/data/version2/'
 
 # Load select waveforms
 files = glob( datadir+'q*.txt' )

@@ -20,12 +20,14 @@ from nrutils import scsearch, gwylm
 from glob import glob
 import h5py
 from os import path
+import pwca
 
 # Preliminaries 
 # --
 
 # Define path for file IO
-data_dir = '/Users/book/KOALA/puck/ll/data/version1/'
+package_dir = parent( pwca.__path__[0] )
+data_dir = package_dir + 'data/version1/'
 
 # Find and load data
 # --

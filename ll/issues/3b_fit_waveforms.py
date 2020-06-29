@@ -15,7 +15,8 @@ from numpy.linalg import norm
 from scipy.optimize import curve_fit
 
 #
-datadir = '/Users/book/KOALA/puck/ll/data/version2/'
+package_dir = parent( pwca.__path__[0] )
+datadir = package_dir + 'data/version2/'
 files = glob( datadir+'q*.txt' )
 
 #

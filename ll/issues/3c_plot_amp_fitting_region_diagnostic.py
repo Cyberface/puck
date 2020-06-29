@@ -6,13 +6,17 @@ from numpy import *
 from positive import *
 from glob import glob
 from pwca import determine_data_fitting_region
+import pwca
 
 
 # Preliminaries
 # --
 
 #
-datadir = '/Users/book/KOALA/puck/ll/data/version2/'
+package_dir = parent( pwca.__path__[0] )
+datadir = package_dir + 'data/version2/'
+
+#
 files = glob( datadir+'*.txt' )
 
 #

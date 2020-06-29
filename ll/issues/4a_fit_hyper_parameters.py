@@ -16,7 +16,10 @@ from pwca import determine_data_fitting_region,pwca_catalog,metadata_dict
 
 #
 alert('Loading parameter space data.')
-datadir = '/Users/book/KOALA/puck/ll/data/version2/'
+
+# Define data location
+package_dir = parent( pwca.__path__[0] )
+datadir = package_dir + 'data/version2/'
 
 # Load and unpuack physical parameter space
 raw_domain = loadtxt(datadir+'fit_intial_binary_parameters.txt')
