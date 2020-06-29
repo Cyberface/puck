@@ -5,7 +5,7 @@ basedir=/Users/book/KOALA/puck/ll/issues
 
 #
 # $basedir/3a_collect_metadata.py
-# $basedir/3b_fit_waveforms.py
+$basedir/3b_fit_waveforms.py
 # $basedir/4a_fit_hyper_parameters.py
-$basedir/4b_document_fits.py
-$basedir/5a_plot_comparisons.py
+# $basedir/4b_document_fits.py
+# $basedir/5a_plot_comparisons.py

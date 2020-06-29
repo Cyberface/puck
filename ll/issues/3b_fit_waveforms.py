@@ -128,7 +128,7 @@ for j,f_ in enumerate(files):
 #
 print ''
 alert('Done.')
-file_path = datadir+'fit_diagnostic.pdf'
+file_path = datadir+'waveform_fit_diagnostic.pdf'
 alert('Saving batch plot to %s'%magenta(file_path))
 savefig(file_path,pad_inches=2, bbox_inches = "tight")
 
