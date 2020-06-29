@@ -109,6 +109,7 @@ def select_scenty_metadata( sceo ):
     
     #
     return theta,m1,m2,eta,delta,chi_eff,chi_p,chi1,chi2,a1,a2 
+
     
 # Given underlying physical parameters, calculate ones useful form modeling
 def parama_party( eta,theta,a1 ):
@@ -144,11 +145,17 @@ def parama_party( eta,theta,a1 ):
     
     #
     A1 = 2 + (3.0*m2)/(2.0*m1)
-    B1 = A1 * abs(a1*sin(theta)*m1*m1)
+    Norm_S1_perp = abs(a1*sin(theta)*m1*m1)
+    B1 = A1 * Norm_S1_perp 
     chi_p = maximum( B1,0 ) / ( A1 * m1*m1 )
+    
+    '''
+    NOTE that the above is basically a1*sin(theta), but we retain the additional steps to illustrate consistency with the more general formula
+    '''
     
     #
     return chi_eff, chi_p
+ 
     
 # Advanced gloss atop mvpolyfit.plot and mvrfit.plot
 def advanced_gmvx_plot( fit_object ):
