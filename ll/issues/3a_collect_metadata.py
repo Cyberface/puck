@@ -12,7 +12,7 @@ import pwca
 
 #
 package_dir = parent( pwca.__path__[0] )
-data_dir = package_dir + 'data/version2/'
+datadir = package_dir + 'data/version2/'
 files = glob( datadir+'q*.txt' )
 
 #
