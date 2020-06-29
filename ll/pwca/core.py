@@ -149,3 +149,157 @@ def parama_party( eta,theta,a1 ):
     
     #
     return chi_eff, chi_p
+    
+# Advanced gloss atop mvpolyfit.plot and mvrfit.plot
+def advanced_gmvx_plot( fit_object ):
+    
+    '''
+    Advanced gloss atop mvpolyfit.plot and mvrfit.plot
+    '''
+    
+    from matplotlib.pyplot import subplots, plot, xlabel, ylabel, title, sca, gca, figaspect, tight_layout
+    from numpy import cos,sin,array,around,ones_like,sort,pi,linspace
+    from positive import eta2q,q2eta
+    from glob import glob
+    from pwca import determine_data_fitting_region,pwca_catalog,metadata_dict
+    
+    # Load and unpuack physical parameter space
+    raw_domain = loadtxt('/Users/book/KOALA/puck/ll/data/version2/fit_intial_binary_parameters.txt')
+    theta,m1,m2,eta,delta,chi_eff,chi_p,chi1,chi2,a1,a2 = raw_domain.T
+
+
+    # Define desired model domain variables and array 
+    u = cos(theta)
+    v = sin(theta)
+    q = 1.0/eta2q(eta)
+    
+    # Load and unpuack physical parameter space -- dphi
+    dphi_range = loadtxt('/Users/book/KOALA/puck/ll/data/version2/fit_opt_dphase_parameters.txt')
+    nu4,nu5,nu6 = dphi_range.T
+
+    # Load and unpuack physical parameter space -- amp
+    amp_range = loadtxt('/Users/book/KOALA/puck/ll/data/version2/fit_opt_amplitude_parameters.txt')
+    mu1, mu2, mu3, mu4 = amp_range.T
+
+    # --------------------------------------- #
+    # Plot ans save fits 
+    # --------------------------------------- #
+
+    # Collect set of unique a1 values
+    a1_point = around(a1,2)
+    a1_set = array(sort(list( set(a1_point) )))
+
+    # Collect set of unique angle values
+    degree_point = (theta*180/pi).astype(int)
+    theta_point = degree_point*pi/180
+    theta_set = array(sort(list( set(theta_point) )))
+
+    # Collect set of unique mass-ratio values
+    q_point = around(array([eta2q(n) for n in eta]),2)
+    q_set = array(sort(list( set(q_point) )))
+
+    # Collect set of unique eta values
+    eta_point = q2eta( q_point )
+    eta_set = q2eta(q_set)
+
+    # Summaru figure for internal diagnostics 
+    summary_fig = fit_object.plot(size_scale=1.5)
+    ax = summary_fig.axes
+    
+    #
+    sca(ax[0])
+    title(fit_object.labels['python'][0])
+    
+    #
+    num_figs = len(a1_set)*len(theta_set)
+    eta_set_figs,set_fig_ax = subplots( len(a1_set), len(theta_set), figsize=5*array([ len(theta_set),len(a1_set) ]) )
+    set_fig_ax = set_fig_ax.flatten();
+    tight_layout(4,4)
+    ax_counter = 0
+
+    #
+    for _a1 in a1_set:
+        for _theta in theta_set:
+
+            #
+            theta_mask = (_theta==theta_point)
+            a1_mask = (_a1==a1_point)
+            mask = a1_mask & theta_mask
+
+            #
+            _eta = eta_point[mask]
+            _u = cos(_theta) 
+
+            #
+            case_eta   = linspace( min(_eta),max(_eta),1000 ) # 
+            case_q     = 1.0/eta2q(case_eta)  
+            case_theta = _theta * ones_like(case_eta)
+            case_u     = cos(case_theta)
+            case_a1    = _a1    * ones_like(case_eta)
+
+            #
+            case_domain = array([case_u,case_eta,case_a1]).T
+            case_range = fit_object.eval(case_domain)
+            opt_range  = fit_object.eval(fit_object.domain[mask,:])
+
+            #
+            sca(ax[0])
+            ax[0].plot3D( case_u, case_eta, case_range, lw=1, alpha=1, color = 'tab:blue' if _a1==a1_set[0] else 'red' )
+            
+            #
+            sca( set_fig_ax[ax_counter] ); ax_counter += 1
+            plot( eta[mask], fit_object.range[mask] if hasattr(fit_object,'range') else fit_object.scalar_range[mask], marker='o',ls='none'  )
+            plot( eta[mask], opt_range, marker='o',ms=10,mfc='none', color='r',ls='none'  )
+            plot( case_eta, case_range, ls='-', color='r' )
+            title( r'$a_1=%1.2f$, $\theta=%1.2f$'%(_a1,round(_theta*180.0/pi,0)) )
+            xlabel(r'$\eta$')
+            ylabel(r'$\%s$'%fit_object.labels['python'][0])
+            
+
+    
+    #
+    num_figs = len(a1_set)*len(eta_set)
+    theta_set_figs,set_fig_ax = subplots( len(a1_set), len(eta_set), figsize=5*array([ len(eta_set),len(a1_set) ]) )
+    set_fig_ax = set_fig_ax.flatten();
+    tight_layout(4,4)
+    ax_counter = 0
+
+    #
+    for _a1 in a1_set:
+        for _eta in eta_set:
+
+            #
+            eta_mask = (_eta==eta_point)
+            a1_mask = (_a1==a1_point)
+            mask = a1_mask & eta_mask
+
+            #
+            _theta = theta_point[mask]
+            _u = cos(_theta) 
+
+            #
+            case_theta   = linspace( min(_theta),max(_theta),1000 ) # 
+            case_u     = cos(case_theta)
+            case_eta   = _eta * ones_like(case_theta)
+            case_a1    = _a1  * ones_like(case_theta)
+
+            #
+            case_domain = array([case_u,case_eta,case_a1]).T
+            case_range = fit_object.eval(case_domain)
+            opt_range  = fit_object.eval(fit_object.domain[mask,:])
+
+            #
+            sca(ax[0])
+            ax[0].plot3D( case_u, case_eta, case_range, lw=1, alpha=1, color = 'tab:blue' if _a1==a1_set[0] else 'red' )
+            
+            #
+            sca( set_fig_ax[ax_counter] ); ax_counter += 1
+            plot( cos(theta[mask]), fit_object.range[mask] if hasattr(fit_object,'range') else fit_object.scalar_range[mask], marker='o',ls='none',color='r'  )
+            plot( cos(theta[mask]), opt_range, marker='o',ms=10,mfc='none', color='b',ls='none'  )
+            plot( cos(case_theta), case_range, ls='-', color='b' )
+            title( r'$a_1=%1.2f$, $q=%1.2f$'%(_a1,eta2q(_eta)) )
+            xlabel(r'$\cos(\theta)$')
+            ylabel(r'$\%s$'%fit_object.labels['python'][0])
+            
+    #
+    return summary_fig, eta_set_figs, theta_set_figs

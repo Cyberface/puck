@@ -7,7 +7,7 @@ from positive import *
 from nrutils import scsearch, gwylm
 from glob import glob
 import pwca
-from pwca import determine_data_fitting_region,pwca_catalog,metadata_dict,parama_party
+from pwca import determine_data_fitting_region,pwca_catalog,metadata_dict,parama_party,advanced_gmvx_plot
 
 # --------------------------------------- #
 # Preliminaries
@@ -65,82 +65,96 @@ fit_object = { k:foo[k] for k in foo if ('nu' in k) or ('mu' in k) }
 #
 for key in fit_object:
     
-    # Summaru figure for internal diagnostics 
-    fit_object[key].labels=labels={'python':[key,('u', 'eta', 'chi_eff', 'chi_p'),''],'latex':['\\'+key,(r'\cos(\theta)', r'\eta', r'\chi_s', r'\chi_p'),'']}
-    summary_fig = fit_object[key].plot(size_scale=1.5)
-    ax = summary_fig.axes
+    # Summary figure for internal diagnostics 
+    fit_object[key].labels=labels={'python':[key,('u', 'eta', 'a1'),''],'latex':['\\'+key,(r'\cos(\theta)', r'\eta', r'a_1'),'']}
+    
+    # Generate diagnostic figures
+    summary_fig,eta_set_fig,theta_set_fig = advanced_gmvx_plot( fit_object[key] )
+    
+    # summary_fig = fit_object[key].plot(size_scale=1.5)
+    # ax = summary_fig.axes
 
-    #
-    sca(ax[0])
-    title(key)
+    # #
+    # sca(ax[0])
+    # title(key)
                                                                         
-    #
-    for _a1 in a1_set:
-        for _theta in theta_set:
+    # #
+    # for _a1 in a1_set:
+    #     for _theta in theta_set:
 
-            #
-            theta_mask = (_theta==theta_point)
-            a1_mask = (_a1==a1_point)
-            mask = a1_mask & theta_mask
+    #         #
+    #         theta_mask = (_theta==theta_point)
+    #         a1_mask = (_a1==a1_point)
+    #         mask = a1_mask & theta_mask
 
-            #
-            _eta = eta_point[mask]
-            _u = cos(_theta) 
+    #         #
+    #         _eta = eta_point[mask]
+    #         _u = cos(_theta) 
 
-            #
-            case_eta   = linspace( min(_eta),max(_eta),1000 ) # 
-            case_theta = _theta * ones_like(case_eta)
-            case_u     = cos(case_theta)
-            case_a1    = _a1    * ones_like(case_eta)
+    #         #
+    #         case_eta   = linspace( min(_eta),max(_eta),1000 ) # 
+    #         case_theta = _theta * ones_like(case_eta)
+    #         case_u     = cos(case_theta)
+    #         case_a1    = _a1    * ones_like(case_eta)
 
-            #
-            case_chi_eff, case_chi_p = parama_party( case_eta,case_theta,case_a1 )
+    #         #
+    #         case_chi_eff, case_chi_p = parama_party( case_eta,case_theta,case_a1 )
 
-            #
-            case_domain = array([case_u,case_eta,case_chi_eff,case_chi_p]).T
-            case_range = fit_object[key].eval(case_domain)
-            opt_range  = fit_object[key].eval(fit_object[key].domain[mask,:])
+    #         #
+    #         case_domain = array([case_u,case_eta,case_chi_eff,case_chi_p]).T
+    #         case_range = fit_object[key].eval(case_domain)
+    #         opt_range  = fit_object[key].eval(fit_object[key].domain[mask,:])
 
-            #
-            sca(ax[0])
-            ax[0].plot3D( case_u, case_eta, case_range, lw=1, alpha=1 )
+    #         #
+    #         sca(ax[0])
+    #         ax[0].plot3D( case_u, case_eta, case_range, lw=1, alpha=1 )
     
 
-    #
-    for _a1 in a1_set:
-        for _eta in eta_set:
+    # #
+    # for _a1 in a1_set:
+    #     for _eta in eta_set:
 
-            #
-            eta_mask = (_eta==eta_point)
-            a1_mask = (_a1==a1_point)
-            mask = a1_mask & eta_mask
+    #         #
+    #         eta_mask = (_eta==eta_point)
+    #         a1_mask = (_a1==a1_point)
+    #         mask = a1_mask & eta_mask
 
-            #
-            _theta = theta_point[mask]
-            _u = cos(_theta) 
+    #         #
+    #         _theta = theta_point[mask]
+    #         _u = cos(_theta) 
 
-            #
-            case_theta   = linspace( min(_theta),max(_theta),1000 ) # 
-            case_u     = cos(case_theta)
-            case_eta   = _eta * ones_like(case_theta)
-            case_a1    = _a1  * ones_like(case_theta)
+    #         #
+    #         case_theta   = linspace( min(_theta),max(_theta),1000 ) # 
+    #         case_u     = cos(case_theta)
+    #         case_eta   = _eta * ones_like(case_theta)
+    #         case_a1    = _a1  * ones_like(case_theta)
 
-            #
-            case_chi_eff, case_chi_p = parama_party( case_eta,case_theta,case_a1 )
+    #         #
+    #         case_chi_eff, case_chi_p = parama_party( case_eta,case_theta,case_a1 )
 
-            #
-            case_domain = array([case_u,case_eta,case_chi_eff,case_chi_p]).T
-            case_range = fit_object[key].eval(case_domain)
-            opt_range  = fit_object[key].eval(fit_object[key].domain[mask,:])
+    #         #
+    #         case_domain = array([case_u,case_eta,case_chi_eff,case_chi_p]).T
+    #         case_range = fit_object[key].eval(case_domain)
+    #         opt_range  = fit_object[key].eval(fit_object[key].domain[mask,:])
 
-            #
-            sca(ax[0])
-            ax[0].plot3D( case_u, case_eta, case_range, lw=1, alpha=1 )
+    #         #
+    #         sca(ax[0])
+    #         ax[0].plot3D( case_u, case_eta, case_range, lw=1, alpha=1 )
             
     # Save summary figure
-    figure_path = datadir + key+'_fit_diagnostic.pdf'
+    figure_path = datadir + key+'_fit_diagnostic_1_summary.pdf'
     alert('Saving diagnostic plot to %s'%magenta(figure_path))
-    savefig( figure_path, pad_inches=0 )
+    summary_fig.savefig( figure_path, pad_inches=0 )
+    
+    # Save eta space figure
+    figure_path = datadir + key+'_fit_diagnostic_2_eta_sets.pdf'
+    alert('Saving diagnostic plot to %s'%magenta(figure_path))
+    eta_set_fig.savefig( figure_path, pad_inches=0 )
+    
+    # Save theta space figure
+    figure_path = datadir + key+'_fit_diagnostic_3_theta_sets.pdf'
+    alert('Saving diagnostic plot to %s'%magenta(figure_path))
+    theta_set_fig.savefig( figure_path, pad_inches=0 )
             
 
 # alert('Generate and save diagnostic plots ...')
@@ -160,16 +174,17 @@ for key in fit_object:
 # --------------------------------------- #
 
 #
-code_string = ['\n\n#\ndef generate_model_params(theta,eta,chi_eff,chi_p):\n\n',
+code_string = ['\n\n#\ndef generate_model_params(theta,eta,a1):\n\n',
                '\t\'\'\'\n\tHola, soy un codigo escribido por "4b_document_fits.py". \n\t~londonl@mit.edu/pilondon2@gmail.com 2020\n\t\'\'\'  \n\n',
                '\t# Import usefuls\n',
                '\tfrom numpy import cos\n\n',
                '\t# Preliminaries\n',
-               '\tu = cos(theta)\n','\tu2 = u*u\n', '\tu3 = u2*u\n', 
-               '\tu3 = u2*u\n', '\teta2 = eta*eta\n', '\teta3 = eta2*eta\n', 
-               '\tchi_eff2 = chi_eff*chi_eff\n', '\tchi_eff3 = chi_eff2*chi_eff\n', 
-               '\tchi_p2 = chi_p*chi_p\n', 
-               '\tchi_p3 = chi_p2*chi_p\n\n' 
+               '\tu = cos(theta)\n',
+               '\tu2 = u*u\n', 
+               '\tu3 = u2*u\n', 
+               '\tu4 = u3*u\n', 
+               '\teta2 = eta*eta\n', 
+               '\teta3 = eta2*eta\n\n' 
               ]
 
 # determine list of fitted variables and sort
@@ -183,15 +198,12 @@ for k in fit_var:
 
     #
     this_code_string = foo[k].__str_python__()
-    this_code_string = this_code_string.replace('lambda u,eta,chi_eff,chi_p: ','')
-    this_code_string = this_code_string.replace('chi_p*chi_p','chi_p2')
-    this_code_string = this_code_string.replace('chi_p2*chi_p','chi_p3')
-    this_code_string = this_code_string.replace('u*u','u2')
-    this_code_string = this_code_string.replace('u2*u','u3')
-    this_code_string = this_code_string.replace('chi_eff*chi_eff','chi_eff2')
-    this_code_string = this_code_string.replace('chi_eff2*chi_eff','chi_eff3')
-    this_code_string = this_code_string.replace('eta*eta','eta2')
-    this_code_string = this_code_string.replace('eta2*eta','eta3')
+    this_code_string = this_code_string.replace('lambda u,eta,a1: ','')
+    this_code_string = this_code_string.replace('u*u*','u2*')
+    this_code_string = this_code_string.replace('u2*u*','u3*')
+    this_code_string = this_code_string.replace('u3*u*','u4*')
+    this_code_string = this_code_string.replace('eta*eta*','eta2*')
+    this_code_string = this_code_string.replace('eta2*eta*','eta3*')
 
     #
     code_string.append( '\t'+this_code_string+'\n\n' )
