@@ -429,7 +429,7 @@ def pwca_phi_mrd( f, m1, m2, chi1, chi2, chip, phi0=0,nu4=None,nu5=None,nu6=None
     new_alpha3 = alpha3 + ( chip * nu3 )
     
     #Define new paremeters --  Merger
-    new_alpha4 = alpha4 + ( chip * nu4 )
+    new_alpha4 = alpha4/fdamp + ( chip * nu4 )
     new_fring = fring + chip*nu5
     new_fdamp = fdamp + chip*nu6
     new_dfring = f - alpha5*new_fring
@@ -438,7 +438,7 @@ def pwca_phi_mrd( f, m1, m2, chi1, chi2, chip, phi0=0,nu4=None,nu5=None,nu6=None
     f4by3 = 1.3333333333333333
     part1 = new_alpha1*f  -  new_alpha2/f  +  f4by3*new_alpha3*(f**0.75)
     # NOTE that we use arctan here not arctan2 because the denominator is always positive
-    part2 = new_alpha4 * arctan( new_dfring / new_fdamp )
+    part2 = new_alpha4 * new_fdamp * arctan( new_dfring / new_fdamp )
     
     # NOTE that the minus sign signals the phase convention used internally
     phi = phi0  -  (part1 + part2)/eta
