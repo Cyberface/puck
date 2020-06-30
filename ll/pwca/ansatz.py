@@ -128,14 +128,19 @@ def template_dphi_mrd( m1, m2, chi1, chi2, chip ):
         new_alpha3 = alpha3 + ( chip * nu3 )
         
         #Define new paremeters --  Merger
-        new_alpha4 = alpha4 + ( chip * nu4 )
+        new_alpha4 = alpha4/fdamp + ( chip * nu4 )
         new_fring = fring + chip*nu5
         new_fdamp = fdamp + chip*nu6
         new_dfring = f - alpha5*new_fring
 
         #
         part1 = new_alpha1 + new_alpha2*f**(-2.0) + new_alpha3*f**(-0.25) 
-        part2 = new_alpha4 / (  new_fdamp*(1 + (new_dfring**2)/(new_fdamp**2))  )
+        
+        # NOTE here try to de-correlate nu6 and nu4 by using the old fdamp in the denominator
+        part2 = new_alpha4 / (  (1 + (new_dfring**2)/(new_fdamp**2))  )
+        
+        # # NOTE that this is the original code below
+        # part2 = new_alpha4 / (  new_fdamp*(1 + (new_dfring**2)/(new_fdamp**2))  )
 
         #
         template_dphi = part1 + part2
