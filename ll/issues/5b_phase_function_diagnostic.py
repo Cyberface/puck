@@ -47,12 +47,12 @@ for a in pwca_catalog:
     opt_nu4,opt_nu5,opt_nu6 = dphi_range[k,:]
     # Load and unpuack OPTIMAL physical parameter space -- amp
     amp_range = loadtxt(datadir+'fit_opt_amplitude_parameters.txt')
-    opt_mu1, opt_mu2, opt_mu3, opt_mu4 = amp_range[k,:]
+    opt_mu2, opt_mu3, opt_mu4 = amp_range[k,:]
 
     # extract useful params from scentry object
     theta,m1,m2,eta,delta,chi_eff,chi_p,chi1,chi2,a1,a2 = select_scenty_metadata(a)
     # generate model parameters 
-    mu1,mu2,mu3,mu4,nu4,nu5,nu6 = generate_model_params(theta,eta,a1)
+    mu2,mu3,mu4,nu4,nu5,nu6 = generate_model_params(theta,eta,a1)
 
     # generate template functions
     template_dphi = template_dphi_mrd( m1, m2, chi1, chi2, chi_p )

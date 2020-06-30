@@ -33,7 +33,7 @@ def template_amp_mrd( m1, m2, chi1, chi2, chip ):
     amp0 = (sqrt(2.0/3.0)*sqrt(eta)) / pi**(1.0/6.0)
     
     #
-    def template(f, mu1=0, mu2=0, mu3=0, mu4=0):
+    def template(f, mu2=0, mu3=0, mu4=0):
         '''
         f:      frequency (code units)
         mu1:    parameter modifying PhenomD gamma1
@@ -41,6 +41,9 @@ def template_amp_mrd( m1, m2, chi1, chi2, chip ):
         mu3:    parameter modifying PhenomD gamma3
         mu4:    parameter modifying PhenomD ringdown central frequency
         '''
+        
+        #
+        mu1 = 0
 
         # Define new paremeters
         new_gamma1 = gamma1 + ( chip * mu1 )
@@ -139,7 +142,7 @@ def template_dphi_mrd( m1, m2, chi1, chi2, chip ):
         # NOTE here try to de-correlate nu6 and nu4 by using the old fdamp in the denominator
         part2 = new_alpha4 / (  (1 + (new_dfring**2)/(new_fdamp**2))  )
         
-        # # NOTE that this is the original code below
+        # # NOTE that this is the old code below
         # part2 = new_alpha4 / (  new_fdamp*(1 + (new_dfring**2)/(new_fdamp**2))  )
 
         #

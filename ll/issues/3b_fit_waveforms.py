@@ -31,7 +31,7 @@ foo = {}
 
 #
 p = 0
-amp_popt_array = zeros( (len(files), 4) )
+amp_popt_array = zeros( (len(files), 3) )
 dphi_popt_array = zeros( (len(files),3) )
 amp_pcov_list = []
 dphi_pcov_list = []
@@ -88,7 +88,7 @@ for j,f_ in enumerate(files):
     #
     log_scaled_amp_fd = log( amp_fd * amp_scale )
     log_template_amp = lambda F,*args: log( template_amp(F,*args) )
-    amp_popt, amp_pcov = curve_fit(log_template_amp, f, log_scaled_amp_fd,p0=[0,0,0,0])
+    amp_popt, amp_pcov = curve_fit(log_template_amp, f, log_scaled_amp_fd,p0=[0,0,0])
     best_fit_amp = template_amp(f,*amp_popt) * inv_amp_scale
     
     #

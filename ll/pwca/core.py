@@ -187,7 +187,7 @@ def advanced_gmvx_plot( fit_object ):
 
     # Load and unpuack physical parameter space -- amp
     amp_range = loadtxt(data_dir+'version2/fit_opt_amplitude_parameters.txt')
-    mu1, mu2, mu3, mu4 = amp_range.T
+    mu2, mu3, mu4 = amp_range.T
 
     # --------------------------------------- #
     # Plot ans save fits 
@@ -402,7 +402,7 @@ def pwca_phi_mrd( f, m1, m2, chi1, chi2, chip, phi0=0,nu4=None,nu5=None,nu6=None
     a1,theta = calc_effective_a1_theta_helper( eta,chi,chip )
     
     # Generate model parameters
-    _,_,_,_,nu4,nu5,nu6 = pwca.generate_model_params(theta,eta,a1)
+    _,_,_,nu4,nu5,nu6 = pwca.generate_model_params(theta,eta,a1)
 
     # Phase parameters
     alpha1 = pwca.d.alpha1(eta,chi)
@@ -421,7 +421,7 @@ def pwca_phi_mrd( f, m1, m2, chi1, chi2, chip, phi0=0,nu4=None,nu5=None,nu6=None
     if (nu4 is None) or (nu5 is None) or (nu6 is None):
         # Generate model parameters
         a1,theta = calc_effective_a1_theta_helper( eta,chi,chip )
-        _,_,_,_,nu4,nu5,nu6 = generate_model_params(theta,eta,a1)
+        _,_,_,nu4,nu5,nu6 = generate_model_params(theta,eta,a1)
     
     # Define new paremeters -- Late inspiral, Plunge
     new_alpha1 = alpha1 + ( chip * nu1 )
@@ -486,13 +486,13 @@ def generate_pwca_waveform( f, m1, m2, X1, X2, L ):
     
     # Generate model parameters
     eta = m1*m2/((m1+m2)**2)
-    mu1,mu2,mu3,mu4,nu4,nu5,nu6 = generate_model_params(theta,eta,a1)
+    mu2,mu3,mu4,nu4,nu5,nu6 = generate_model_params(theta,eta,a1)
     
     # Evaluate phase model 
     model_phi     = pwca_phi_mrd( f, m1, m2, chi1, chi2, chi_p, nu4=nu4, nu5=nu5, nu6=nu6 )
     # Evaluate amplitude model
     scale_factor = f ** (-7.0/6.0)
-    model_amp     = template_amp( f, mu1, mu2, mu3, mu4 ) * scale_factor
+    model_amp     = template_amp( f, mu2, mu3, mu4 ) * scale_factor
     
     # Compute complex waveform
     # NOTE minus sign added to be consistent with external phase conventions
