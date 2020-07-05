@@ -47,7 +47,7 @@ def determine_data_fitting_region( data, fmin=0.03, fmax=0.12 ):
     
     # Determine new fmin and max using heuristic 
     f_knot = f[mask][knot]
-    new_fmin = f_knot * 0.5# 0.325
+    new_fmin = f_knot * 0.30# 0.5# 0.325
     new_fmax = f_knot + 0.020 # 0.025 
     
     #

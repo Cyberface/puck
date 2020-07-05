@@ -31,7 +31,7 @@ foo = {}
 
 #
 p = 0
-amp_popt_array = zeros( (len(files), 4) )
+amp_popt_array = zeros( (len(files), 5) )
 dphi_popt_array = zeros( (len(files),3) )
 amp_pcov_list = []
 dphi_pcov_list = []
@@ -59,20 +59,17 @@ for j,f_ in enumerate(files):
     #
     physical_param_array[j,:] = metadata_dict['array_data'][k]
     
+    # GENERATE TEMPLATE FUNCTIONS
+    # ---
+    template_amp, template_dphi, template_phi = pwca.template_amp_phase(m1, m2, chi1, chi2, chi_p)
+    
     # PHASE DERIVATIVE
     # ---
     
     #
-    template_phi = pwca.ansatz.template_dphi_mrd(m1, m2, chi1, chi2, chi_p)
-    phenomd_dphi = template_phi(f)
-    
-    #
-    dphi_popt, dphi_pcov = curve_fit(template_phi, f, dphi_td,p0=[0,0,0])
-    best_fit_dphi = template_phi(f,*dphi_popt)
-    
-    #
-    dphi_popt_array[j,:] = dphi_popt
-    dphi_pcov_list.append( dphi_pcov )
+    phenomd_dphi = template_dphi(f)
+    dphi_popt, dphi_pcov = curve_fit(template_dphi, f, dphi_td,p0=[0,0,0])
+    best_fit_dphi = template_dphi(f,*dphi_popt)
     
     # AMPLITUDE
     # ---
@@ -82,18 +79,18 @@ for j,f_ in enumerate(files):
     inv_amp_scale = f ** (-7.0/6)
     
     #
-    template_amp = pwca.ansatz.template_amp_mrd(m1, m2, chi1, chi2, chi_p)
-    phenomd_amp = template_amp(f) * inv_amp_scale
+    log_scaled_template_amp = lambda X,MU0,MU1,MU2,MU3,MU4: log(  template_amp(X,MU0,MU1,MU2,MU3,MU4)*amp_scale  )
+    phenomd_amp = template_amp(f)
     
     #
-    log_scaled_amp_fd = log( amp_fd * amp_scale )
-    log_template_amp = lambda F,*args: log( template_amp(F,*args) )
-    amp_popt, amp_pcov = curve_fit(log_template_amp, f, log_scaled_amp_fd,p0=[0,0,0,0])
-    best_fit_amp = template_amp(f,*amp_popt) * inv_amp_scale
+    scaled_amp_fd = amp_fd * amp_scale
+    log_scaled_amp_fd = log(scaled_amp_fd)
+    log_scaled_amp_popt, log_scaled_amp_pcov = curve_fit(log_scaled_template_amp, f, log_scaled_amp_fd,p0=[0,0,0,0,0])
+    best_fit_amp = exp(log_scaled_template_amp(f,*log_scaled_amp_popt)) * inv_amp_scale
     
     #
-    amp_popt_array[j,:] = amp_popt
-    amp_pcov_list.append( amp_pcov )
+    amp_popt_array[j,:] = log_scaled_amp_popt
+    amp_pcov_list.append( log_scaled_amp_pcov )
     
     # PLOTTING
     # ---
@@ -106,6 +103,7 @@ for j,f_ in enumerate(files):
     title(simname,size=12,loc='left')
     legend(ncol=3,loc=1)
     ylabel(r'$\frac{d}{df}\arg(\tilde{h}_{22})$')
+    xscale('log')
     #
     title(f_.split('/')[-1].split('.')[0],loc='left',size=12)
     if (p==(2*len(files)-1)) or (p==1):  xlabel('$fM$')
@@ -116,6 +114,7 @@ for j,f_ in enumerate(files):
     plot( f, amp_fd, label='NR:Precessing', color='k', alpha=0.15, lw=6 )
     plot( f, best_fit_amp, label='Best Fit', color='r', ls='-',lw=2 )
     title(simname,size=12,loc='left')
+    xscale('log')
     yscale('log')
     legend(ncol=3,loc=3)
     ylabel(r'$|\tilde{h}_{22}(f)|$')
