@@ -428,7 +428,7 @@ def pwca_phi_mrd( f, m1, m2, chi1, chi2, chip, phi0=0,nu4=None,nu5=None,nu6=None
     new_alpha2 = alpha2 + ( chip * nu2 )
     new_alpha3 = alpha3 + ( chip * nu3 )
     
-    #Define new paremeters --  Merger
+    # Define new paremeters --  Merger
     new_alpha4 = alpha4 + ( chip * nu4 )
     new_fring = fring + chip*nu5
     new_fdamp = fdamp + chip*nu6

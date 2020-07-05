@@ -1,5 +1,63 @@
 
 #
+def template_amp_phase(m1, m2, chi1, chi2, chip):
+    '''
+    Given system masses and L-parallel dimensionless spins, output amplitude and phase methods. 
+    
+    USAGE
+    ---
+    template_amp, template_dphi, template_phi = template_amp_phase(m1, m2, chi1, chi2, chip)
+    
+    '''
+    
+    #
+    from phenom.utils.utils import UsefulPowers
+    from numpy import array
+    import pwca, phenom
+    
+    # Create PrototypePhenomDCoprecess instance (PhenomD Object -- PDO)
+    pdo = phenom.PrototypePhenomDCoprecess(m1=m1, m2=m2, chi1z=chi1, chi2z=chi2)
+    
+    #
+    def template_amp( f, mu1=0, mu2=0, mu3=0, mu4=0 ):
+        
+        # Recompute internal parameters -- including connection coefficients for continuous inspiral to merger-ringdown
+        pdo.model_pars = pdo.compute_model_parameters( pdo.p, pdo.__finspin_func_string__, mu1=mu1, mu2=mu2, mu3=mu3, mu4=mu4, chip=chip )
+        
+        #
+        pdo_amp  = array( [pdo.IMRPhenomDAmplitude(k, pdo.model_pars, UsefulPowers(k)) for k in f] )
+        
+        #
+        return pdo_amp
+    
+    #
+    def template_dphi( f, nu4=0, nu5=0, nu6=0 ):
+        
+        # Recompute internal parameters -- including connection coefficients for continuous inspiral to merger-ringdown
+        pdo.model_pars = pdo.compute_model_parameters( pdo.p, pdo.__finspin_func_string__, nu4=nu4, nu5=nu5, nu6=nu6, chip=chip )
+        
+        #
+        pdo_dphi  = array( [pdo.IMRPhenomDPhaseDerivFrequencyPoint(k,pdo.p['eta'], pdo.model_pars) for k in f] )
+        
+        #
+        return pdo_dphi
+    
+    #
+    def template_phi( f, nu4=0, nu5=0, nu6=0 ):
+        
+        # Recompute internal parameters -- including connection coefficients for continuous inspiral to merger-ringdown
+        pdo.model_pars = pdo.compute_model_parameters( pdo.p, pdo.__finspin_func_string__, nu4=nu4, nu5=nu5, nu6=nu6, chip=chip )
+        
+        #
+        pdo_dphi  = array( [pdo.IMRPhenomDPhase(k,pdo.p['eta'], pdo.model_pars, UsefulPowers(k)) for k in f] )
+        
+        #
+        return pdo_dphi
+        
+    #
+    return template_amp, template_dphi, template_phi
+
+#
 def template_amp_mrd( m1, m2, chi1, chi2, chip ):
     """
     amplitude merger-ringdown ansatz
