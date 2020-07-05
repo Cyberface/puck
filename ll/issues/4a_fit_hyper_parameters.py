@@ -28,7 +28,7 @@ theta,m1,m2,eta,delta,chi_eff,chi_p,chi1,chi2,a1,a2 = raw_domain.T
 
 # Define desired model domain variables and array 
 u = cos(theta)
-model_domain = array( [ u, eta, a1 ] ).T
+model_domain = array( [ u, eta, delta, a1 ] ).T
 
 # Load and unpuack physical parameter space -- dphi
 dphi_range = loadtxt(datadir+'fit_opt_dphase_parameters.txt')
@@ -36,11 +36,11 @@ nu4,nu5,nu6 = dphi_range.T
 
 # Load and unpuack physical parameter space -- amp
 amp_range = loadtxt(datadir+'fit_opt_amplitude_parameters.txt')
-mu1, mu2, mu3, mu4 = amp_range.T
+mu0, mu1, mu2, mu3, mu4 = amp_range.T
 
 #
 foo = {}
-foo['model_domain_header'] = '# columns are: cos(theta), eta, chi_eff, chi_p '
+foo['model_domain_header'] = '# columns are: cos(theta), eta, delta, a1 '
 foo['model_domain'] = model_domain
 
 # --------------------------------------- #
@@ -58,12 +58,22 @@ foo['model_domain'] = model_domain
 alert('Fitting dphase parameters ...',header=True)
 
 # nu4
-foo['nu4'] = gmvpfit( model_domain, nu4,fitatol=0.001,verbose=True,maxdeg_list=[4,3,1],center=True,temper=False)
+# ---
+key = 'nu4'
+labels={'python':[key,('u', 'eta', 'delta', 'a1'),''],'latex':['\\'+key,(r'\cos(\theta)', r'\eta', r'\delta', r'a_1'),'']}
+foo[key] = gmvpfit( model_domain, nu4,fitatol=0.0001,verbose=True,maxdeg_list=[2,1,1,1],center=True,labels=labels)
+
 # nu5
-foo['nu5'] = gmvrfit( model_domain, nu5,fitatol=0.001,verbose=True,maxdeg_list=[4,3,1],center=True)
-foo['nu5'].range = foo['nu5'].scalar_range
+# ---
+key = 'nu5'
+labels={'python':[key,('u', 'eta', 'delta', 'a1'),''],'latex':['\\'+key,(r'\cos(\theta)', r'\eta', r'\delta', r'a_1'),'']}
+foo[key] = gmvpfit( model_domain, nu5,fitatol=0.001,verbose=True,maxdeg_list=[2,1,1,1],center=True,labels=labels)
+
 # nu6
-foo['nu6'] = gmvpfit( model_domain, nu6,fitatol=0.001,verbose=True,maxdeg_list=[4,3,1],center=True)
+# ---
+key = 'nu6'
+labels={'python':[key,('u', 'eta', 'delta', 'a1'),''],'latex':['\\'+key,(r'\cos(\theta)', r'\eta', r'\delta', r'a_1'),'']}
+foo[key] = gmvpfit( model_domain, nu6,fitatol=0.001,verbose=True,maxdeg_list=[2,0,2,1],center=True,labels=labels)
 
 # --------------------------------------- #
 # Fit amplitude parameters 
@@ -79,16 +89,27 @@ foo['nu6'] = gmvpfit( model_domain, nu6,fitatol=0.001,verbose=True,maxdeg_list=[
 '''
 alert('Fitting amplitude parameters ...',header=True)
 
+# mu0 
+# ---
+key = 'mu0'
+labels={'python':[key,('u', 'eta', 'delta', 'a1'),''],'latex':['\\'+key,(r'\cos(\theta)', r'\eta', r'\delta', r'a_1'),'']}
+foo[key] = gmvpfit( model_domain, mu0,fitatol=0.0001,verbose=True,maxdeg_list=[2,1,1,1],center=True,labels=labels)
 # mu1 
-foo['mu1'] = gmvpfit( model_domain, mu1,fitatol=0.001,verbose=True,maxdeg_list=[4,3,1],center=True)
+# ---
+key = 'mu1'
+labels={'python':[key,('u', 'eta', 'delta', 'a1'),''],'latex':['\\'+key,(r'\cos(\theta)', r'\eta', r'\delta', r'a_1'),'']}
+foo[key] = gmvpfit( model_domain, mu1,fitatol=0.001,verbose=True,maxdeg_list=[3,1,1,1],center=True,labels=labels)
 # mu2
-foo['mu2'] = gmvrfit( model_domain, mu2,fitatol=0.001,verbose=True,maxdeg_list=[4,3,1],center=True)
-foo['mu2'].range = foo['mu2'].scalar_range
+# ---
+key = 'mu2'
+labels={'python':[key,('u', 'eta', 'delta', 'a1'),''],'latex':['\\'+key,(r'\cos(\theta)', r'\eta', r'\delta', r'a_1'),'']}
+foo[key] = gmvpfit( model_domain, mu2,fitatol=0.001,verbose=True,maxdeg_list=[3,2,0,1],center=True,labels=labels)
 # mu3
-foo['mu3'] = gmvpfit( model_domain, mu3,fitatol=0.001,verbose=True,maxdeg_list=[4,3,1],center=True)
+# ---
+foo['mu3'] = gmvpfit( model_domain, mu3,fitatol=0.001,verbose=True,maxdeg_list=[4,3,0,1],center=True,estatol=0.0090)
 # mu4
-foo['mu4'] = gmvrfit( model_domain, mu4,fitatol=0.001,verbose=True,maxdeg_list=[4,3,1],center=True)
-foo['mu4'].range = foo['mu4'].scalar_range
+# ---
+foo['mu4'] = gmvpfit( model_domain, mu4,fitatol=0.001,verbose=True,maxdeg_list=[4,3,0,1],center=True)
 
 # --------------------------------------- #
 # Saving fit data

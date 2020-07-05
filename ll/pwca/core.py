@@ -47,7 +47,7 @@ def determine_data_fitting_region( data, fmin=0.03, fmax=0.12 ):
     
     # Determine new fmin and max using heuristic 
     f_knot = f[mask][knot]
-    new_fmin = f_knot * 0.30# 0.5# 0.325
+    new_fmin = f_knot * 0.300 #0.5# 0.325
     new_fmax = f_knot + 0.020 # 0.025 
     
     #
@@ -167,7 +167,7 @@ def advanced_gmvx_plot( fit_object ):
     
     from matplotlib.pyplot import subplots, plot, xlabel, ylabel, title, sca, gca, figaspect, tight_layout
     from numpy import cos,sin,array,around,ones_like,sort,pi,linspace
-    from positive import eta2q,q2eta
+    from positive import eta2q,q2eta,eta2delta
     from glob import glob
     from pwca import determine_data_fitting_region,pwca_catalog,metadata_dict
     
@@ -187,7 +187,7 @@ def advanced_gmvx_plot( fit_object ):
 
     # Load and unpuack physical parameter space -- amp
     amp_range = loadtxt(data_dir+'version2/fit_opt_amplitude_parameters.txt')
-    mu1, mu2, mu3, mu4 = amp_range.T
+    mu0, mu1, mu2, mu3, mu4 = amp_range.T
 
     # --------------------------------------- #
     # Plot ans save fits 
@@ -239,14 +239,15 @@ def advanced_gmvx_plot( fit_object ):
             _u = cos(_theta) 
 
             #
-            case_eta   = linspace( min(_eta),max(_eta),1000 ) # 
+            case_eta   = linspace( min(_eta),max(_eta),1000 ) 
+            case_delta = eta2delta( case_eta )
             case_q     = 1.0/eta2q(case_eta)  
             case_theta = _theta * ones_like(case_eta)
             case_u     = cos(case_theta)
             case_a1    = _a1    * ones_like(case_eta)
 
             #
-            case_domain = array([case_u,case_eta,case_a1]).T
+            case_domain = array([case_u,case_eta,case_delta,case_a1]).T
             case_range = fit_object.eval(case_domain)
             opt_range  = fit_object.eval(fit_object.domain[mask,:])
 
@@ -289,10 +290,11 @@ def advanced_gmvx_plot( fit_object ):
             case_theta   = linspace( min(_theta),max(_theta),1000 ) # 
             case_u     = cos(case_theta)
             case_eta   = _eta * ones_like(case_theta)
+            case_delta = eta2delta( case_eta )
             case_a1    = _a1  * ones_like(case_theta)
 
             #
-            case_domain = array([case_u,case_eta,case_a1]).T
+            case_domain = array([case_u,case_eta,case_delta,case_a1]).T
             case_range = fit_object.eval(case_domain)
             opt_range  = fit_object.eval(fit_object.domain[mask,:])
 

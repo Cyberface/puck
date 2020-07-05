@@ -71,6 +71,10 @@ for j,f_ in enumerate(files):
     dphi_popt, dphi_pcov = curve_fit(template_dphi, f, dphi_td,p0=[0,0,0])
     best_fit_dphi = template_dphi(f,*dphi_popt)
     
+    #
+    dphi_popt_array[j,:] = dphi_popt
+    dphi_pcov_list.append( dphi_pcov )
+    
     # AMPLITUDE
     # ---
     
