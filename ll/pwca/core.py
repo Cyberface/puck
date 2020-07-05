@@ -373,22 +373,12 @@ def calc_effective_a1_theta( m1, m2, X1, X2, L ):
     return a1,theta 
    
 #
-def pwca_phi_mrd( f, m1, m2, chi1, chi2, chip, phi0=0,nu4=None,nu5=None,nu6=None ):
+def pwca_phi( f, m1, m2, chi1, chi2, chip, phi0=0,nu4=None,nu5=None,nu6=None ):
     """
     Generate phase of merger-ringown FD waveform.
     Adapted from equation 14 arXiv:1508.07253, and made to be consistent with template_dphi_mrd() in the pwca package.
     londonl@mit.edu/pilondon2@gmail.com 2020
     """
-    
-    # sqrootf = sqrt(Mf)
-    # fpow1_5 = Mf * sqrootf
-    # # // check if this is any faster: 2 sqrts instead of one pow(x,0.75)
-    # fpow0_75 = sqrt(fpow1_5); # pow(f,0.75)
-
-    # ans = -(model_pars['alpha2']/Mf) \
-    #         + (4.0/3.0) * (model_pars['alpha3'] * fpow0_75) \
-    #         + model_pars['alpha1'] * Mf \
-    #         + model_pars['alpha4'] * rholm * arctan( (Mf - model_pars['alpha5'] * model_pars['fRD']) / (rholm * model_pars['fDM'] * taulm) )
     
     # Import usefuls
     from numpy import exp,sqrt,pi,ndarray,arctan
@@ -404,46 +394,12 @@ def pwca_phi_mrd( f, m1, m2, chi1, chi2, chip, phi0=0,nu4=None,nu5=None,nu6=None
     a1,theta = calc_effective_a1_theta_helper( eta,chi,chip )
     
     # Generate model parameters
-    _,_,_,_,nu4,nu5,nu6 = pwca.generate_model_params(theta,eta,a1)
-
-    # Phase parameters
-    alpha1 = pwca.d.alpha1(eta,chi)
-    alpha2 = pwca.d.alpha2(eta,chi)
-    alpha3 = pwca.d.alpha3(eta,chi)
-    alpha4 = pwca.d.alpha4(eta,chi)
-    alpha5 = pwca.d.alpha5(eta,chi)
-
-    # PhenomD remnant parameters
-    final_spin = pwca.d.FinalSpin0815_s(eta,chi)
-    fring = pwca.d.fring(eta,chi1,chi2,final_spin)
-    fdamp = pwca.d.fdamp(eta,chi1,chi2,final_spin)
-        
-    # Start the precession parama party
-    nu1 = nu2 = nu3 = 0
     if (nu4 is None) or (nu5 is None) or (nu6 is None):
-        # Generate model parameters
-        a1,theta = calc_effective_a1_theta_helper( eta,chi,chip )
-        _,_,_,_,nu4,nu5,nu6 = generate_model_params(theta,eta,a1)
-    
-    # Define new paremeters -- Late inspiral, Plunge
-    new_alpha1 = alpha1 + ( chip * nu1 )
-    new_alpha2 = alpha2 + ( chip * nu2 )
-    new_alpha3 = alpha3 + ( chip * nu3 )
-    
-    # Define new paremeters --  Merger
-    new_alpha4 = alpha4 + ( chip * nu4 )
-    new_fring = fring + chip*nu5
-    new_fdamp = fdamp + chip*nu6
-    new_dfring = f - alpha5*new_fring
-    
-    # NOTE that part1 is identical to the PhenomD equivalent
-    f4by3 = 1.3333333333333333
-    part1 = new_alpha1*f  -  new_alpha2/f  +  f4by3*new_alpha3*(f**0.75)
-    # NOTE that we use arctan here not arctan2 because the denominator is always positive
-    part2 = new_alpha4 * arctan( new_dfring / new_fdamp )
+        _,_,_,_,_,nu4,nu5,nu6 = pwca.generate_model_params(theta,eta,a1)
     
     # NOTE that the minus sign signals the phase convention used internally
-    phi = phi0  -  (part1 + part2)/eta
+    _,_,template_phi = pwca.template_amp_phase(m1, m2, chi1, chi2, chip)
+    phi = phi0  -  template_phi( f, nu4, nu5, nu6 )
     
     #
     return phi
@@ -471,7 +427,7 @@ def generate_pwca_waveform( f, m1, m2, X1, X2, L ):
     from numpy import dot,exp
     from numpy.linalg import norm
     from positive import calc_chi_p,calc_chi_eff
-    from pwca import template_amp_mrd, pwca_phi_mrd, calc_effective_a1_theta, generate_model_params
+    from pwca import template_amp_phase, pwca_phi, calc_effective_a1_theta, generate_model_params
     
     # Compute physical parameters for model 
     l = L/norm(L)
@@ -484,17 +440,17 @@ def generate_pwca_waveform( f, m1, m2, X1, X2, L ):
     a1,theta = calc_effective_a1_theta( m1, m2, X1, X2, L )
     
     # Generate template amplitude function -- input chi_p along with PhenomD parameters
-    template_amp  = template_amp_mrd(  m1, m2, chi1, chi2, chi_p )
+    template_amp,_,_  = template_amp_phase(  m1, m2, chi1, chi2, chi_p )
     
     # Generate model parameters
     eta = m1*m2/((m1+m2)**2)
-    mu1,mu2,mu3,mu4,nu4,nu5,nu6 = generate_model_params(theta,eta,a1)
+    mu0,mu1,mu2,mu3,mu4,nu4,nu5,nu6 = generate_model_params(theta,eta,a1)
     
     # Evaluate phase model 
-    model_phi     = pwca_phi_mrd( f, m1, m2, chi1, chi2, chi_p, nu4=nu4, nu5=nu5, nu6=nu6 )
+    model_phi     = pwca_phi( f, m1, m2, chi1, chi2, chi_p, nu4=nu4, nu5=nu5, nu6=nu6 )
     # Evaluate amplitude model
-    scale_factor = f ** (-7.0/6.0)
-    model_amp     = template_amp( f, mu1, mu2, mu3, mu4 ) * scale_factor
+    scale_factor = 1
+    model_amp     = template_amp( f, mu0, mu1, mu2, mu3, mu4 ) * scale_factor
     
     # Compute complex waveform
     # NOTE minus sign added to be consistent with external phase conventions

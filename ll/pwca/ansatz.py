@@ -40,7 +40,7 @@ def template_amp_phase(m1, m2, chi1, chi2, chip):
         pdo_dphi  = array( [pdo.IMRPhenomDPhaseDerivFrequencyPoint(k,pdo.p['eta'], pdo.model_pars) for k in f] )
         
         #
-        shift = max( pdo_dphi )
+        shift = max( pdo_dphi[ f<0.14 ] )
         pdo_dphi -= shift
         pdo_dphi *= -1
         

@@ -89,14 +89,17 @@ for key in fit_object:
 code_string = ['\n\n#\ndef generate_model_params(theta,eta,a1):\n\n',
                '\t\'\'\'\n\tHola, soy un codigo escribido por "4b_document_fits.py". \n\t~londonl@mit.edu/pilondon2@gmail.com 2020\n\t\'\'\'  \n\n',
                '\t# Import usefuls\n',
-               '\tfrom numpy import cos\n\n',
+               '\tfrom numpy import cos, sqrt\n\n',
                '\t# Preliminaries\n',
                '\tu = cos(theta)\n',
                '\tu2 = u*u\n', 
                '\tu3 = u2*u\n', 
                '\tu4 = u3*u\n', 
                '\teta2 = eta*eta\n', 
-               '\teta3 = eta2*eta\n\n' 
+               '\teta3 = eta2*eta\n' 
+               '\tdelta = sqrt(1-4*eta)\n',
+               '\tdelta2 = delta*delta\n', 
+               '\tdelta3 = delta2*delta\n\n' 
               ]
 
 # determine list of fitted variables and sort
@@ -110,12 +113,15 @@ for k in fit_var:
 
     #
     this_code_string = foo[k].__str_python__()
-    this_code_string = this_code_string.replace('lambda u,eta,a1: ','')
+    this_code_string = this_code_string.replace('lambda u,eta,delta,a1: ','')
     this_code_string = this_code_string.replace('u*u*','u2*')
     this_code_string = this_code_string.replace('u2*u*','u3*')
     this_code_string = this_code_string.replace('u3*u*','u4*')
+    this_code_string = this_code_string.replace('u2*u2*','u4*')
     this_code_string = this_code_string.replace('eta*eta*','eta2*')
     this_code_string = this_code_string.replace('eta2*eta*','eta3*')
+    this_code_string = this_code_string.replace('delta*delta*','delta2*')
+    this_code_string = this_code_string.replace('delta2*delta*','delta3*')
 
     #
     code_string.append( '\t'+this_code_string+'\n\n' )
