@@ -87,9 +87,9 @@ for j,f_ in enumerate(files):
     phenomd_amp = template_amp(f)
     
     #
-    scaled_amp_fd = amp_fd * amp_scale
-    log_scaled_amp_fd = log(scaled_amp_fd)
-    log_scaled_amp_popt, log_scaled_amp_pcov = curve_fit(log_scaled_template_amp, f, log_scaled_amp_fd,p0=[0,0,0,0,0])
+    scaled_amp_td = amp_td * amp_scale
+    log_scaled_amp_td = log(scaled_amp_td)
+    log_scaled_amp_popt, log_scaled_amp_pcov = curve_fit(log_scaled_template_amp, f, log_scaled_amp_td,p0=[0,0,0,0,0])
     best_fit_amp = exp(log_scaled_template_amp(f,*log_scaled_amp_popt)) * inv_amp_scale
     
     #
@@ -115,7 +115,7 @@ for j,f_ in enumerate(files):
     #subplot(1,2,2)
     sca(ax[p]); p+=1
     plot( f, phenomd_amp, label='PhenomD', ls='--',alpha=0.9,color='k',lw=2 )
-    plot( f, amp_fd, label='NR:Precessing', color='k', alpha=0.15, lw=6 )
+    plot( f, amp_td, label='NR:Precessing', color='k', alpha=0.15, lw=6 )
     plot( f, best_fit_amp, label='Best Fit', color='r', ls='-',lw=2 )
     title(simname,size=12,loc='left')
     xscale('log')
