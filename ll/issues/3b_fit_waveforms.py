@@ -68,7 +68,7 @@ for j,f_ in enumerate(files):
     
     #
     phenomd_dphi = template_dphi(f)
-    dphi_popt, dphi_pcov = curve_fit(template_dphi, f, dphi_td,p0=[0,0,0])
+    dphi_popt, dphi_pcov = curve_fit(template_dphi, f, smooth(dphi_td,method='savgol',width=90).answer,p0=[0,0,0])
     best_fit_dphi = template_dphi(f,*dphi_popt)
     
     #
