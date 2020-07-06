@@ -47,7 +47,7 @@ for k in range(len(data)):
     
     #
     new_data,new_knot,new_fmin,new_fmax,_ = determine_data_fitting_region(data[k])
-    plot( f[new_knot], amp_fd[new_knot], color='k', mfc='none', marker='o', ms=20, mew=4, alpha = 0.15  )
+    plot( f[new_knot], amp_td[new_knot], color='k', mfc='none', marker='o', ms=20, mew=4, alpha = 0.15  )
     axvline( new_fmin, color='k', ls='-',lw=8,alpha = 0.15 )
     axvline( new_fmax, color='k', ls='-',lw=8,alpha = 0.15 )
 
@@ -59,11 +59,11 @@ for k in range(len(data)):
     x = log(f[mask])
     y = smooth(dphi_td[mask]).answer
     knot = argmin(y)
-    plot( f[mask][knot], amp_fd[mask][knot], color='b', mfc='none', marker='o', ms=10, mew=2  )
+    plot( f[mask][knot], amp_td[mask][knot], color='b', mfc='none', marker='o', ms=10, mew=2  )
 
     #
     plot( f, amp_td, alpha=0.5, color='orange', label=r'cp-$\psi_4$-td',lw=2 )
-    plot( f, amp_fd, color='k', ls='-', label=r'cp-$\psi_4$-fd',lw=2 )
+    plot( f, amp_td, color='k', ls='-', label=r'cp-$\psi_4$-fd',lw=2 )
 
     #
     xlim(0.002,0.2)

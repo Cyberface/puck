@@ -122,7 +122,7 @@ for a in pwca_catalog:
     ax_id += 1
 
     #
-    plot( raw_f, raw_amp_fd, label='Symmetrised NR', color='k', alpha=0.5 )
+    plot( raw_f, raw_amp_td, label='Symmetrised NR', color='k', alpha=0.5 )
     #
     plot( raw_fp, opt_model_amp, ls='-', color='c', lw=1, label='Waveform fit' )
     plot( raw_fp, model_amp, ls='--', color='b', lw=1, label='End Model' )
