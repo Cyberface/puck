@@ -32,7 +32,7 @@ model_domain = array( [ u, eta, delta, a1 ] ).T
 
 # Load and unpuack physical parameter space -- dphi
 dphi_range = loadtxt(datadir+'fit_opt_dphase_parameters.txt')
-nu4,nu5,nu6 = dphi_range.T
+nu2,nu4,nu5,nu6 = dphi_range.T
 
 # Load and unpuack physical parameter space -- amp
 amp_range = loadtxt(datadir+'fit_opt_amplitude_parameters.txt')
@@ -57,6 +57,11 @@ foo['model_domain'] = model_domain
 '''
 alert('Fitting dphase parameters ...',header=True)
 
+# nu2
+# ---
+key = 'nu2'
+foo[key] = gmvpfit( model_domain, nu2,fitatol=0.0001,verbose=True,maxdeg_list=[4,3,0,1],center=True)
+
 # nu4
 # ---
 key = 'nu4'
@@ -70,7 +75,7 @@ foo[key] = gmvpfit( model_domain, nu5,fitatol=0.0001,verbose=True,maxdeg_list=[2
 # nu6
 # ---
 key = 'nu6'
-foo[key] = gmvpfit( model_domain, nu6,fitatol=0.0001,verbose=True,maxdeg_list=[2,1,1,1],center=True)
+foo[key] = gmvpfit( model_domain, nu6,fitatol=0.0001,verbose=True,maxdeg_list=[4,3,0,1],center=True,estatol=0.015)
 
 # --------------------------------------- #
 # Fit amplitude parameters 

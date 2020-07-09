@@ -24,14 +24,6 @@ foo = pickle.load( open( foo_path, "rb" ) )
 raw_domain = loadtxt(datadir+'fit_intial_binary_parameters.txt')
 theta,m1,m2,eta,delta,chi_eff,chi_p,chi1,chi2,a1,a2 = raw_domain.T
 
-# Load and unpuack physical parameter space -- dphi
-dphi_range = loadtxt(datadir+'fit_opt_dphase_parameters.txt')
-nu4,nu5,nu6 = dphi_range.T
-
-# Load and unpuack physical parameter space -- amp
-amp_range = loadtxt(datadir+'fit_opt_amplitude_parameters.txt')
-mu0, mu1, mu2, mu3, mu4 = amp_range.T
-
 # --------------------------------------- #
 # Plot ans save fits 
 # --------------------------------------- #
@@ -79,6 +71,8 @@ for key in fit_object:
     figure_path = datadir + key+'_fit_diagnostic_3_theta_sets.pdf'
     alert('Saving diagnostic plot to %s'%magenta(figure_path))
     theta_set_fig.savefig( figure_path, pad_inches=0, bbox_inches = 'tight' )
+    
+    close('all')
     
    
 # --------------------------------------- #

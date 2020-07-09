@@ -32,7 +32,7 @@ foo = {}
 #
 p = 0
 amp_popt_array = zeros( (len(files), 5) )
-dphi_popt_array = zeros( (len(files),3) )
+dphi_popt_array = zeros( (len(files),4) )
 amp_pcov_list = []
 dphi_pcov_list = []
 physical_param_array = zeros( (len(files), 11) )
@@ -53,7 +53,7 @@ for j,f_ in enumerate(files):
     metadata = metadata_dict['array_data'][k,:]
     
     #
-    f,amp_td,amp_fd,dphi_td,dphi_fd = data.T
+    f,amp_td,amp_fd,dphi_td,dphi_fd,phi_td,phi_fd = data.T
     theta,m1,m2,eta,delta,chi_eff,chi_p,chi1,chi2,a1,a2 = metadata_dict['array_data'][k]
     
     #
@@ -68,7 +68,7 @@ for j,f_ in enumerate(files):
     
     #
     phenomd_dphi = template_dphi(f)
-    dphi_popt, dphi_pcov = curve_fit(template_dphi, f, dphi_td,p0=[0,0,0])
+    dphi_popt, dphi_pcov = curve_fit(template_dphi, f, dphi_td,p0=[0,0,0,0])
     best_fit_dphi = template_dphi(f,*dphi_popt)
     
     #
@@ -102,7 +102,8 @@ for j,f_ in enumerate(files):
     #subplot(1,2,1)
     sca(ax[p]); p+=1
     plot( f, phenomd_dphi, label='PhenomD', ls='--',alpha=0.9,color='k',lw=2 )
-    plot( f, dphi_td, label='NR:Precessing', color='k', alpha=0.15, lw=6 )
+    plot( f, dphi_td, label='NR:Precessing', color='k', alpha=0.5, lw=1 )
+    # plot( f, raw_dphi_td, label='NR:Precessing', color='k', alpha=0.15, lw=6 )
     plot( f, best_fit_dphi, label='Best Fit', color='r', ls='-',lw=2 )
     title(simname,size=12,loc='left')
     legend(ncol=3,loc=1)
