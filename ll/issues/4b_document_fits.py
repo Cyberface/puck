@@ -46,7 +46,7 @@ eta_point = q2eta( q_point )
 eta_set = q2eta(q_set)
 
 #
-fit_object = { k:foo[k] for k in foo if ('nu' in k) or ('mu' in k) }
+fit_object = { k:foo[k] for k in foo if ('nu' in k) or ('mu' in k) or ('zeta' in k) }
 
 #
 for key in fit_object:
@@ -97,7 +97,7 @@ code_string = ['\n\n#\ndef generate_model_params(theta,eta,a1):\n\n',
               ]
 
 # determine list of fitted variables and sort
-fit_var = sort( [ k for k in foo.keys() if ('mu' in k)or('nu' in k) ] )
+fit_var = sort( [ k for k in foo.keys() if ('mu' in k)or('nu' in k)or('zeta' in k) ] )
 
 #
 for k in fit_var:

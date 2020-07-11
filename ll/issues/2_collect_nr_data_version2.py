@@ -62,9 +62,9 @@ for a in A:
     
     #
     txt_file_path = data_dir+'%s.txt'%a.simname
-    if path.exists(txt_file_path):
-        warning('It seems that %s already exists, so we\'re moving on ...'%magenta(txt_file_path),header=True)
-        continue
+    # if path.exists(txt_file_path):
+    #     warning('It seems that %s already exists, so we\'re moving on ...'%magenta(txt_file_path),header=True)
+    #     continue
     
     #
     alert('Processing: %s'%magenta(a.simname),header=True)
@@ -162,17 +162,19 @@ for a in A:
     fd_dphi = frame['sym-cp-y-fd'][2,2]['psi4'].fd_dphi
     fd_phi = frame['sym-cp-y-fd'][2,2]['psi4'].fd_phi
     #
-    shift = min(fd_dphi[mask])
+    shift = min(smooth(fd_dphi[mask]).answer)
     fd_dphi -= shift
     fd_phi  -= f * shift
+    fd_phi -= fd_phi[ sum(f<0.03)-1+argmin(smooth(fd_dphi[mask]).answer) ]
     
     td_amp  = frame['sym-cp-y-td'][2,2]['strain'].fd_amp
     td_dphi = frame['sym-cp-y-td'][2,2]['psi4'].fd_dphi
     td_phi = frame['sym-cp-y-td'][2,2]['psi4'].fd_phi
     #
-    shift = min(td_dphi[mask])
+    shift = min(smooth(td_dphi[mask]).answer)
     td_dphi -= shift
     td_phi  -= f * shift
+    td_phi -= td_phi[ sum(f<0.03)-1+argmin(smooth(td_dphi[mask]).answer) ]
     
     data_array = array([ f, td_amp, fd_amp, td_dphi, fd_dphi, td_phi, fd_phi ]).T
 

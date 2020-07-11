@@ -31,16 +31,17 @@ def template_amp_phase(m1, m2, chi1, chi2, chip):
         return pdo_amp
     
     #
-    def template_dphi( f, nu4=0, nu5=0, nu6=0 ):
+    # def template_dphi( f, nu4=0, nu5=0, nu6=0 ):
+    def template_dphi( f, nu4=0, nu5=0, nu6=0, zeta2=0 ):
         
         # Recompute internal parameters -- including connection coefficients for continuous inspiral to merger-ringdown
-        pdo.model_pars = pdo.compute_model_parameters( pdo.p, pdo.__finspin_func_string__, nu4=nu4, nu5=nu5, nu6=nu6, chip=chip )
+        pdo.model_pars = pdo.compute_model_parameters( pdo.p, pdo.__finspin_func_string__, nu4=nu4, nu5=nu5, nu6=nu6, zeta2=zeta2, chip=chip )
         
         #
         pdo_dphi  = array( [pdo.IMRPhenomDPhaseDerivFrequencyPoint(k,pdo.p['eta'], pdo.model_pars) for k in f] )
         
         #
-        shift = max( pdo_dphi[ f<0.14 ] )
+        shift = max( pdo_dphi[ (f>=0.03) & (f<=0.12) ] )
         pdo_dphi -= shift
         pdo_dphi *= -1
         
@@ -48,16 +49,28 @@ def template_amp_phase(m1, m2, chi1, chi2, chip):
         return pdo_dphi
     
     #
-    def template_phi( f, nu4=0, nu5=0, nu6=0 ):
+    def template_phi( f, nu4=0, nu5=0, nu6=0, zeta2=0 ):
+        
+        #
+        from numpy import argmax
+        from positive import spline_diff
         
         # Recompute internal parameters -- including connection coefficients for continuous inspiral to merger-ringdown
-        pdo.model_pars = pdo.compute_model_parameters( pdo.p, pdo.__finspin_func_string__, nu4=nu4, nu5=nu5, nu6=nu6, chip=chip )
+        pdo.model_pars = pdo.compute_model_parameters( pdo.p, pdo.__finspin_func_string__, nu4=nu4, nu5=nu5, nu6=nu6, zeta2=zeta2, chip=chip )
         
         #
-        pdo_dphi  = array( [pdo.IMRPhenomDPhase(k,pdo.p['eta'], pdo.model_pars, UsefulPowers(k)) for k in f] )
+        pdo_phi  = array( [pdo.IMRPhenomDPhase(k,pdo.p['eta'], pdo.model_pars, UsefulPowers(k)) for k in f] )
         
         #
-        return pdo_dphi
+        dphi = spline_diff(f,pdo_phi)
+        shift_id = sum(f<0.03) + argmax( dphi[ (f>=0.03) & (f<=0.12) ] )
+        shift = dphi[shift_id]
+        pdo_phi -= f*shift
+        pdo_phi -= pdo_phi[shift_id]
+        pdo_phi *= -1
+        
+        #
+        return pdo_phi
         
     #
     return template_amp, template_dphi, template_phi
