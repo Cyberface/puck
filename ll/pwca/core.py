@@ -6,6 +6,7 @@ from positive import alert,magenta,parent
 from numpy import loadtxt,load
 from os.path import exists
 import pwca
+import json
 
 #
 package_dir = parent( pwca.__path__[0] )
@@ -21,6 +22,12 @@ metadata_dict_path = data_dir+'metadata_dict.pickle'
 metadata_dict = load(metadata_dict_path)
 alert('Metadata dictionary for calibration runs stored to %s'%magenta('"pwca.metadata_dict"'),fname='pwca.core')
 
+#
+catalog_paper_md_path = data_dir+'catalog_paper_metadata.json'
+with open(catalog_paper_md_path, 'r') as f:
+    catalog_paper_metadata = json.load(f)
+alert('Metadata dictionary for Ed\'s catalog paper stoed to %s'%magenta('"pwca.catalog_paper_metadata"'),fname='pwca.core')
+
 # Function to determine version2 data fitting region
 def determine_data_fitting_region( data, fmin=0.03, fmax=0.12 ):
     '''
@@ -30,10 +37,11 @@ def determine_data_fitting_region( data, fmin=0.03, fmax=0.12 ):
     
     # Import usefuls
     from numpy import argmin,log
-    from positive import smooth,find
+    from positive import smooth,find,lim
+    from matplotlib.pyplot import figure,plot,show,axhline,xlim,ylim
     
     # Extract data 
-    f,amp_td,amp_fd,dphi_td,dphi_fd = data
+    f,amp_td,amp_fd,dphi_td,dphi_fd,phi_td,phi_fd = data
 
     # Use default domain bounds to determine a mask
     mask = (f>=fmin) & (f<=fmax)
@@ -47,13 +55,12 @@ def determine_data_fitting_region( data, fmin=0.03, fmax=0.12 ):
     
     # Determine new fmin and max using heuristic 
     f_knot = f[mask][knot]
-    new_fmin = f_knot * 0.300 #0.5# 0.325
+    new_fmin = max(f_knot * 0.22,0.018) # 0.5 # 0.325
     new_fmax = f_knot + 0.020 # 0.025 
     
     #
     new_mask = (f>=new_fmin) & (f<=new_fmax)
     new_data = data.T[new_mask,:]
-    new_data[:,-2:] -= y_knot
     
     #
     new_knot = find(f>=fmin)[0]+knot
@@ -180,14 +187,6 @@ def advanced_gmvx_plot( fit_object ):
     u = cos(theta)
     v = sin(theta)
     q = 1.0/eta2q(eta)
-    
-    # Load and unpuack physical parameter space -- dphi
-    dphi_range = loadtxt(data_dir+'version2/fit_opt_dphase_parameters.txt')
-    nu4,nu5,nu6 = dphi_range.T
-
-    # Load and unpuack physical parameter space -- amp
-    amp_range = loadtxt(data_dir+'version2/fit_opt_amplitude_parameters.txt')
-    mu0, mu1, mu2, mu3, mu4 = amp_range.T
 
     # --------------------------------------- #
     # Plot ans save fits 
@@ -373,7 +372,7 @@ def calc_effective_a1_theta( m1, m2, X1, X2, L ):
     return a1,theta 
    
 #
-def pwca_phi( f, m1, m2, chi1, chi2, chip, phi0=0,nu4=None,nu5=None,nu6=None ):
+def pwca_phi( f, m1, m2, chi1, chi2, chip, phi0=0,nu2=None,nu4=None,nu5=None,nu6=None ):
     """
     Generate phase of merger-ringown FD waveform.
     Adapted from equation 14 arXiv:1508.07253, and made to be consistent with template_dphi_mrd() in the pwca package.
@@ -394,12 +393,12 @@ def pwca_phi( f, m1, m2, chi1, chi2, chip, phi0=0,nu4=None,nu5=None,nu6=None ):
     a1,theta = calc_effective_a1_theta_helper( eta,chi,chip )
     
     # Generate model parameters
-    if (nu4 is None) or (nu5 is None) or (nu6 is None):
-        _,_,_,_,_,nu4,nu5,nu6 = pwca.generate_model_params(theta,eta,a1)
+    if (nu2 is None) or (nu4 is None) or (nu5 is None) or (nu6 is None):
+        _,_,_,_,_,nu4,nu5,nu6,zeta2 = pwca.generate_model_params(theta,eta,a1)
     
     # NOTE that the minus sign signals the phase convention used internally
     _,_,template_phi = pwca.template_amp_phase(m1, m2, chi1, chi2, chip)
-    phi = phi0  -  template_phi( f, nu4, nu5, nu6 )
+    phi = phi0  -  template_phi( f, nu4, nu5, nu6, zeta2 )
     
     #
     return phi
@@ -444,7 +443,7 @@ def generate_pwca_waveform( f, m1, m2, X1, X2, L ):
     
     # Generate model parameters
     eta = m1*m2/((m1+m2)**2)
-    mu0,mu1,mu2,mu3,mu4,nu4,nu5,nu6 = generate_model_params(theta,eta,a1)
+    mu0,mu1,mu2,mu3,mu4,nu4,nu5,nu6,zeta2 = generate_model_params(theta,eta,a1)
     
     # Evaluate phase model 
     model_phi     = pwca_phi( f, m1, m2, chi1, chi2, chi_p, nu4=nu4, nu5=nu5, nu6=nu6 )

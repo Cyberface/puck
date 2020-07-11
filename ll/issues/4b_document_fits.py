@@ -24,14 +24,6 @@ foo = pickle.load( open( foo_path, "rb" ) )
 raw_domain = loadtxt(datadir+'fit_intial_binary_parameters.txt')
 theta,m1,m2,eta,delta,chi_eff,chi_p,chi1,chi2,a1,a2 = raw_domain.T
 
-# Load and unpuack physical parameter space -- dphi
-dphi_range = loadtxt(datadir+'fit_opt_dphase_parameters.txt')
-nu4,nu5,nu6 = dphi_range.T
-
-# Load and unpuack physical parameter space -- amp
-amp_range = loadtxt(datadir+'fit_opt_amplitude_parameters.txt')
-mu0, mu1, mu2, mu3, mu4 = amp_range.T
-
 # --------------------------------------- #
 # Plot ans save fits 
 # --------------------------------------- #
@@ -54,7 +46,7 @@ eta_point = q2eta( q_point )
 eta_set = q2eta(q_set)
 
 #
-fit_object = { k:foo[k] for k in foo if ('nu' in k) or ('mu' in k) }
+fit_object = { k:foo[k] for k in foo if ('nu' in k) or ('mu' in k) or ('zeta' in k) }
 
 #
 for key in fit_object:
@@ -80,6 +72,8 @@ for key in fit_object:
     alert('Saving diagnostic plot to %s'%magenta(figure_path))
     theta_set_fig.savefig( figure_path, pad_inches=0, bbox_inches = 'tight' )
     
+    close('all')
+    
    
 # --------------------------------------- #
 # Generate fit python code 
@@ -103,7 +97,7 @@ code_string = ['\n\n#\ndef generate_model_params(theta,eta,a1):\n\n',
               ]
 
 # determine list of fitted variables and sort
-fit_var = sort( [ k for k in foo.keys() if ('mu' in k)or('nu' in k) ] )
+fit_var = sort( [ k for k in foo.keys() if ('mu' in k)or('nu' in k)or('zeta' in k) ] )
 
 #
 for k in fit_var:

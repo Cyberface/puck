@@ -62,9 +62,9 @@ for a in A:
     
     #
     txt_file_path = data_dir+'%s.txt'%a.simname
-    if path.exists(txt_file_path):
-        warning('It seems that %s already exists, so we\'re moving on ...'%magenta(txt_file_path),header=True)
-        continue
+    # if path.exists(txt_file_path):
+    #     warning('It seems that %s already exists, so we\'re moving on ...'%magenta(txt_file_path),header=True)
+    #     continue
     
     #
     alert('Processing: %s'%magenta(a.simname),header=True)
@@ -90,7 +90,6 @@ for a in A:
             foo['sym-'+k] = frame[k].__symmetrize__()
     #
     frame = foo
-    del foo
     
     # Produce diagnostic plots 
     def plot_amp_dphi(frame):
@@ -157,15 +156,31 @@ for a in A:
     
     # Select and output amplitude and phase data
     f = frame['raw'].f
+    mask = (f>0.03) & (f<0.12) 
+    
     fd_amp  = frame['sym-cp-y-fd'][2,2]['strain'].fd_amp
     fd_dphi = frame['sym-cp-y-fd'][2,2]['psi4'].fd_dphi
+    fd_phi = frame['sym-cp-y-fd'][2,2]['psi4'].fd_phi
+    #
+    shift = min(smooth(fd_dphi[mask]).answer)
+    fd_dphi -= shift
+    fd_phi  -= f * shift
+    fd_phi -= fd_phi[ sum(f<0.03)-1+argmin(smooth(fd_dphi[mask]).answer) ]
+    
     td_amp  = frame['sym-cp-y-td'][2,2]['strain'].fd_amp
     td_dphi = frame['sym-cp-y-td'][2,2]['psi4'].fd_dphi
-    data_array = array([ f, td_amp, fd_amp, td_dphi, fd_dphi ]).T
+    td_phi = frame['sym-cp-y-td'][2,2]['psi4'].fd_phi
+    #
+    shift = min(smooth(td_dphi[mask]).answer)
+    td_dphi -= shift
+    td_phi  -= f * shift
+    td_phi -= td_phi[ sum(f<0.03)-1+argmin(smooth(td_dphi[mask]).answer) ]
+    
+    data_array = array([ f, td_amp, fd_amp, td_dphi, fd_dphi, td_phi, fd_phi ]).T
 
     #
     alert('Saving waveform data to "%s"'%yellow(txt_file_path))
     # pickle.dump( data_array, open( file_path, "wb" ) )
-    savetxt( txt_file_path, data_array, header='[ f, td_amp, fd_amp, td_dphi, fd_dphi ], here td and fd refer to the frame type used; frequencies are positive, waveform info are symmetrized in the psi4 TD/FD coprecessing frame from NR simulation at %s'%frame['raw'].simdir )
+    savetxt( txt_file_path, data_array, header='[ f, td_amp, fd_amp, td_dphi, fd_dphi, td_phi, fd_phi ], here td and fd refer to the frame type used; frequencies are positive, waveform info are symmetrized in the psi4 TD/FD coprecessing frame from NR simulation at %s'%frame['raw'].simdir )
     
 alert('All done.')

@@ -52,7 +52,7 @@ for a in pwca_catalog:
 
     # Load and unpuack OPTIMAL physical parameter space -- dphi
     dphi_range = loadtxt(datadir+'fit_opt_dphase_parameters.txt')
-    opt_nu4,opt_nu5,opt_nu6 = dphi_range[k,:]
+    opt_nu4,opt_nu5,opt_nu6,opt_zeta2 = dphi_range[k,:]
     # Load and unpuack OPTIMAL physical parameter space -- amp
     amp_range = loadtxt(datadir+'fit_opt_amplitude_parameters.txt')
     opt_mu0, opt_mu1, opt_mu2, opt_mu3, opt_mu4 = amp_range[k,:]
@@ -60,7 +60,7 @@ for a in pwca_catalog:
     # extract useful params from scentry object
     theta,m1,m2,eta,delta,chi_eff,chi_p,chi1,chi2,a1,a2 = select_scenty_metadata(a)
     # generate model parameters 
-    mu0,mu1,mu2,mu3,mu4,nu4,nu5,nu6 = generate_model_params(theta,eta,a1)
+    mu0,mu1,mu2,mu3,mu4,nu4,nu5,nu6,zeta2 = generate_model_params(theta,eta,a1)
 
     # generate template functions
     template_amp, template_dphi, _ = pwca.template_amp_phase(m1, m2, chi1, chi2, chi_p)
@@ -74,9 +74,9 @@ for a in pwca_catalog:
         error(bold(red('CHECK PASSED: '))+'Generated physical parameters are not identical to calibration ones.')
 
     #
-    raw_f,raw_amp_td,raw_amp_fd,raw_dphi_td,raw_dphi_fd = raw_data
+    raw_f,raw_amp_td,raw_amp_fd,raw_dphi_td,raw_dphi_fd,raw_phi_td,raw_phi_fd = raw_data
     adjusted_raw_dphi_td = raw_dphi_td-min( raw_dphi_td[ (raw_f>=fmin) & (raw_f<=fmax)  ])
-    f,amp_td,amp_fd,dphi_td,dphi_fd = data.T
+    f,amp_td,amp_fd,dphi_td,dphi_fd,phi_td,phi_fd = data.T
 
     #
     raw_positive_mask = raw_f>0
@@ -84,8 +84,8 @@ for a in pwca_catalog:
 
     #
     phenomd_dphi   = template_dphi( raw_fp )
-    opt_model_dphi = template_dphi( raw_fp, opt_nu4, opt_nu5, opt_nu6 )
-    model_dphi     = template_dphi( raw_fp, nu4, nu5, nu6 )
+    opt_model_dphi = template_dphi( raw_fp, opt_nu4, opt_nu5, opt_nu6, opt_zeta2 )
+    model_dphi     = template_dphi( raw_fp, nu4, nu5, nu6, zeta2 )
 
     # Prepare amplitude data
     scale_factor = 1 # raw_fp ** (-7.0/6.0)
