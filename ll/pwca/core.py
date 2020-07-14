@@ -457,3 +457,54 @@ def generate_pwca_waveform( f, m1, m2, X1, X2, L ):
     
     #
     return y
+    
+#
+def __generate_modified_phenomd_helper__(f, m1, m2, chi1,chi2,chi_p):
+    
+    # Import usefuls
+    import pwca, phenom
+    from numpy import dot,exp,array
+    from numpy.linalg import norm
+    from phenom.utils.utils import UsefulPowers
+    from positive import calc_chi_p,calc_chi_eff
+    
+    # # Compute physical parameters for model 
+    # l = L/norm(L)
+    # chi1,chi2 = [ dot(k,l) for k in (X1,X2) ]
+    # chi_p     = calc_chi_p(m1,X1,m2,X2,L)
+    
+    # Create PhenomD instance (PhenomD Object -- PDO) with appropriate final spin function input 
+    pdo = phenom.PhenomD(m1=m1, m2=m2, chi1z=chi1, chi2z=chi2,chip=chi_p,finspin_func = "FinalSpinIMRPhenomD_all_in_plane_spin_on_larger_BH")
+    
+    #
+    pdo_amp  = array( [pdo.IMRPhenomDAmplitude(k, pdo.model_pars, UsefulPowers(k)) for k in f] )
+    
+    #
+    pdo_phi  = array( [pdo.IMRPhenomDPhase(k,pdo.p['eta'], pdo.model_pars, UsefulPowers(k)) for k in f] )
+    
+    #
+    y = pdo_amp * exp( -1j * pdo_phi)
+    
+    #
+    return y
+    
+#
+def generate_modified_phenomd(f, m1, m2, X1, X2, L):
+    
+    # Import usefuls
+    import pwca, phenom
+    from numpy import dot,exp,array
+    from numpy.linalg import norm
+    from phenom.utils.utils import UsefulPowers
+    from positive import calc_chi_p,calc_chi_eff
+    
+    # Compute physical parameters for model 
+    l = L/norm(L)
+    chi1,chi2 = [ dot(k,l) for k in (X1,X2) ]
+    chi_p     = calc_chi_p(m1,X1,m2,X2,L)
+    
+    #
+    y = __generate_modified_phenomd_helper__(f, m1, m2, chi1, chi2, chi_p)
+    
+    #
+    return y
