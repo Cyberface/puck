@@ -31,6 +31,7 @@ u = cos(theta)
 model_domain = array( [ u, eta, delta, a1 ] ).T
 
 # Load and unpuack physical parameter space -- dphi
+# NOTE that parameters from the phase fit are available, but have been shown to result in marginally worse matches
 dphi_range = loadtxt(datadir+'fit_opt_dphase_parameters.txt')
 nu4,nu5,nu6,zeta2 = dphi_range.T
 
