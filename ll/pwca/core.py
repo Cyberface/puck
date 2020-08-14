@@ -19,7 +19,7 @@ alert('Catalog of calibration runs stored to %s'%magenta('"pwca.pwca_catalog"'),
 
 # Always load curated metadata for calibration runs 
 metadata_dict_path = data_dir+'metadata_dict.pickle'
-metadata_dict = load(metadata_dict_path)
+metadata_dict = load(metadata_dict_path,allow_pickle=True)
 alert('Metadata dictionary for calibration runs stored to %s'%magenta('"pwca.metadata_dict"'),fname='pwca.core')
 
 #
