@@ -370,9 +370,36 @@ def calc_effective_a1_theta( m1, m2, X1, X2, L ):
     
     #
     return a1,theta 
-   
+
 #
-def pwca_phi( f, m1, m2, chi1, chi2, chip, phi0=0,nu2=None,nu4=None,nu5=None,nu6=None ):
+def pwca_phi_helper(f, theta, eta, a1, chip, nu4, nu5, nu6, zeta2, phi0=0):
+    
+    """
+    Same as pwca_phi but with input being actual parameters used for model.
+    Generate phase of merger-ringown FD waveform.
+    Adapted from equation 14 arXiv:1508.07253, and made to be consistent with template_dphi_mrd() in the pwca package.
+    londonl@mit.edu/pilondon2@gmail.com 2020
+    """
+    
+    # Import usefuls
+    from numpy import exp,sqrt,pi,ndarray,arctan
+    import pwca, phenom
+    from positive import eta2m1m2
+    
+    # Generate model parameters
+    if (nu4 is None) or (nu5 is None) or (nu6 is None) or (zeta2 is None):
+        _,_,_,_,_,nu4,nu5,nu6,zeta2 = pwca.generate_model_params(theta,eta,a1)
+    
+    # NOTE that the minus sign signals the phase convention used internally
+    m1,m2 = eta2m1m2(eta); chi1,chi2 = a1,0
+    _,_,template_phi = pwca.template_amp_phase(m1, m2, chi1, chi2, chip)
+    phi = phi0  -  template_phi( f, nu4, nu5, nu6, zeta2 )
+    
+    return phi
+
+
+#
+def pwca_phi( f, m1, m2, chi1, chi2, chip, nu4, nu5, nu6, zeta2, phi0=0 ):
     """
     Generate phase of merger-ringown FD waveform.
     Adapted from equation 14 arXiv:1508.07253, and made to be consistent with template_dphi_mrd() in the pwca package.
@@ -393,7 +420,7 @@ def pwca_phi( f, m1, m2, chi1, chi2, chip, phi0=0,nu2=None,nu4=None,nu5=None,nu6
     a1,theta = calc_effective_a1_theta_helper( eta,chi,chip )
     
     # Generate model parameters
-    if (nu2 is None) or (nu4 is None) or (nu5 is None) or (nu6 is None):
+    if (nu4 is None) or (nu5 is None) or (nu6 is None) or (zeta2 is None):
         _,_,_,_,_,nu4,nu5,nu6,zeta2 = pwca.generate_model_params(theta,eta,a1)
     
     # NOTE that the minus sign signals the phase convention used internally
@@ -403,6 +430,51 @@ def pwca_phi( f, m1, m2, chi1, chi2, chip, phi0=0,nu2=None,nu4=None,nu5=None,nu6
     #
     return phi
        
+#
+def generate_pwca_waveform_helper( f, theta, eta, a1, chi_p ):
+    '''
+    DESCRIPTION
+    ---
+    Same as generate_pwca_waveform but with input being actual parameters used for model.
+    
+    USAGE
+    ---
+    fd_waveform_array = pwca_waveform( f, m1, m2, X1, X2, L )
+    
+    f,       frequency array of desired values; frequencies are geometric: M*f_hz with M=1
+    theta,
+    eta,
+    a1,
+    chip,       the total in-plane spin or chi_p (either may be used with care in the correct context)
+    '''
+    
+    # Import usefuls
+    from numpy import dot,exp
+    from positive import eta2m1m2
+    from numpy.linalg import norm
+    from positive import calc_chi_p,calc_chi_eff
+    from pwca import template_amp_phase, pwca_phi, calc_effective_a1_theta, generate_model_params
+    
+    # Generate template amplitude function -- input chi_p along with PhenomD parameters
+    m1,m2 = eta2m1m2(eta); chi1,chi2 = a1,0
+    template_amp,_,_  = template_amp_phase(  m1, m2, chi1, chi2, chi_p )
+    
+    # Generate model parameters
+    mu0,mu1,mu2,mu3,mu4,nu4,nu5,nu6,zeta2 = generate_model_params(theta,eta,a1)
+    
+    # Evaluate phase model 
+    model_phi     = pwca_phi_helper( f, theta, eta, a1, chi_p, nu4, nu5, nu6, zeta2 )
+    # Evaluate amplitude model
+    scale_factor = 1
+    model_amp     = template_amp( f, mu0, mu1, mu2, mu3, mu4 ) * scale_factor
+    
+    # Compute complex waveform
+    # NOTE minus sign added to be consistent with external phase conventions
+    y = model_amp * exp( -1j * model_phi )
+    
+    #
+    return y
+
 #
 def generate_pwca_waveform( f, m1, m2, X1, X2, L ):
     '''
@@ -446,7 +518,7 @@ def generate_pwca_waveform( f, m1, m2, X1, X2, L ):
     mu0,mu1,mu2,mu3,mu4,nu4,nu5,nu6,zeta2 = generate_model_params(theta,eta,a1)
     
     # Evaluate phase model 
-    model_phi     = pwca_phi( f, m1, m2, chi1, chi2, chi_p, nu4=nu4, nu5=nu5, nu6=nu6 )
+    model_phi     = pwca_phi( f, m1, m2, chi1, chi2, chi_p, nu4, nu5, nu6, zeta2 )
     # Evaluate amplitude model
     scale_factor = 1
     model_amp     = template_amp( f, mu0, mu1, mu2, mu3, mu4 ) * scale_factor
