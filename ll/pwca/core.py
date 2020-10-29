@@ -209,7 +209,7 @@ def advanced_gmvx_plot( fit_object ):
     eta_point = q2eta( q_point )
     eta_set = q2eta(q_set)
 
-    # Summaru figure for internal diagnostics 
+    # Summary figure for internal diagnostics 
     summary_fig = fit_object.plot(size_scale=1.5)
     ax = summary_fig.axes
     
@@ -323,7 +323,7 @@ def calc_effective_a1_theta_helper( eta,chi_eff,chi_p ):
     # Convert to effective single-spin system
     # NOTE that the formulas below result from taking single-spin equations for chi_p(theta,a1) and chi_s(theta,a1), and inverting them to get theta and a1
     # ---
-    # >>> Premilinaries
+    # >>> Preliminaries
     m1,m2 = eta2m1m2(eta) # NOTE m1>m2 convention
     if m1<m2: error('m1<m2, check positive\'s eta2m1m2 as it should output m1>=m2')
     M = m1+m2
@@ -382,7 +382,7 @@ def pwca_phi_helper(f, theta, eta, a1, chip, nu4, nu5, nu6, zeta2, phi0=0):
     """
     
     # Import usefuls
-    from numpy import exp,sqrt,pi,ndarray,arctan
+    from numpy import exp,sqrt,pi,ndarray,arctan,cos
     import pwca, phenom
     from positive import eta2m1m2
     
@@ -391,7 +391,7 @@ def pwca_phi_helper(f, theta, eta, a1, chip, nu4, nu5, nu6, zeta2, phi0=0):
         _,_,_,_,_,nu4,nu5,nu6,zeta2 = pwca.generate_model_params(theta,eta,a1)
     
     # NOTE that the minus sign signals the phase convention used internally
-    m1,m2 = eta2m1m2(eta); chi1,chi2 = a1,0
+    m1,m2 = eta2m1m2(eta); chi1,chi2 = a1*cos(theta),0
     _,_,template_phi = pwca.template_amp_phase(m1, m2, chi1, chi2, chip)
     phi = phi0  -  template_phi( f, nu4, nu5, nu6, zeta2 )
     
@@ -449,14 +449,14 @@ def generate_pwca_waveform_helper( f, theta, eta, a1, chi_p ):
     '''
     
     # Import usefuls
-    from numpy import dot,exp
+    from numpy import dot,exp,cos
     from positive import eta2m1m2
     from numpy.linalg import norm
     from positive import calc_chi_p,calc_chi_eff
     from pwca import template_amp_phase, pwca_phi, calc_effective_a1_theta, generate_model_params
     
     # Generate template amplitude function -- input chi_p along with PhenomD parameters
-    m1,m2 = eta2m1m2(eta); chi1,chi2 = a1,0
+    m1,m2 = eta2m1m2(eta); chi1,chi2 = a1*cos(theta),0
     template_amp,_,_  = template_amp_phase(  m1, m2, chi1, chi2, chi_p )
     
     # Generate model parameters
@@ -519,6 +519,7 @@ def generate_pwca_waveform( f, m1, m2, X1, X2, L ):
     
     # Evaluate phase model 
     model_phi     = pwca_phi( f, m1, m2, chi1, chi2, chi_p, nu4, nu5, nu6, zeta2 )
+    
     # Evaluate amplitude model
     scale_factor = 1
     model_amp     = template_amp( f, mu0, mu1, mu2, mu3, mu4 ) * scale_factor
