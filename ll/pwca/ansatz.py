@@ -1,6 +1,6 @@
 
 #
-def template_amp_phase(m1, m2, chi1, chi2, chip):
+def template_amp_phase(m1, m2, chi1, chi2, chip,fref=None):
     '''
     Given system masses and L-parallel dimensionless spins, output amplitude and phase methods. 
     
@@ -16,7 +16,7 @@ def template_amp_phase(m1, m2, chi1, chi2, chip):
     import pwca, phenom
     
     # Create PrototypePhenomDCoprecess instance (PhenomD Object -- PDO)
-    pdo = phenom.PrototypePhenomDCoprecess(m1=m1, m2=m2, chi1z=chi1, chi2z=chi2)
+    pdo = phenom.PrototypePhenomDCoprecess(m1=m1, m2=m2, chi1z=chi1, chi2z=chi2,fRef=fref)
     
     #
     def template_amp( f, mu0=0, mu1=0, mu2=0, mu3=0, mu4=0 ):
