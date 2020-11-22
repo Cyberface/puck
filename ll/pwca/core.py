@@ -372,7 +372,7 @@ def calc_effective_a1_theta( m1, m2, X1, X2, L ):
     return a1,theta 
 
 #
-def pwca_phi_helper(f, theta, eta, a1, chi1, chi2, chip, nu4, nu5, nu6, zeta2, phi0=0, fref=None):
+def pwca_phi_helper(f, theta, eta, a1, chi1, chi2, chip, nu4, nu5, nu6, zeta2, phi0=0, fref=0):
     
     """
     Same as pwca_phi but with input being actual parameters used for model.
@@ -399,7 +399,7 @@ def pwca_phi_helper(f, theta, eta, a1, chi1, chi2, chip, nu4, nu5, nu6, zeta2, p
 
 
 #
-def pwca_phi( f, m1, m2, chi1, chi2, chip, nu4, nu5, nu6, zeta2, phi0=0,fref=None ):
+def pwca_phi( f, m1, m2, chi1, chi2, chip, nu4, nu5, nu6, zeta2, phi0=0,fref=0 ):
     """
     Generate phase of merger-ringown FD waveform.
     Adapted from equation 14 arXiv:1508.07253, and made to be consistent with template_dphi_mrd() in the pwca package.
@@ -431,7 +431,7 @@ def pwca_phi( f, m1, m2, chi1, chi2, chip, nu4, nu5, nu6, zeta2, phi0=0,fref=Non
     return phi
        
 #
-def generate_pwca_waveform_helper( f, theta, eta, a1, chi1, chi2, chi_p,fref=None ):
+def generate_pwca_waveform_helper( f, theta, eta, a1, chi1, chi2, chi_p,fref=0 ):
     '''
     DESCRIPTION
     ---
@@ -476,7 +476,7 @@ def generate_pwca_waveform_helper( f, theta, eta, a1, chi1, chi2, chi_p,fref=Non
     return y
 
 #
-def generate_pwca_waveform( f, m1, m2, X1, X2, L, fref=None ):
+def generate_pwca_waveform( f, m1, m2, X1, X2, L, fref=0 ):
     '''
     DESCRIPTION
     ---

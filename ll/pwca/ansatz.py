@@ -1,6 +1,6 @@
 
 #
-def template_amp_phase(m1, m2, chi1, chi2, chip,fref=None):
+def template_amp_phase(m1, m2, chi1, chi2, chip,fref=0):
     '''
     Given system masses and L-parallel dimensionless spins, output amplitude and phase methods. 
     
