@@ -102,10 +102,18 @@ for j,f_ in enumerate(files):
     log_scaled_template_amp = lambda X,MU0,MU1,MU2,MU3,MU4: log(  template_amp(X,MU0,MU1,MU2,MU3,MU4)*amp_scale  )
     phenomd_amp = template_amp(f)
     
-    #
-    scaled_amp_fd = amp_fd * amp_scale
-    log_scaled_amp_fd = log(scaled_amp_fd)
-    log_scaled_amp_popt, log_scaled_amp_pcov = curve_fit(log_scaled_template_amp, f, log_scaled_amp_fd,p0=[0,0,0,0,0])
+    # NOTE that the fd amplitude (for FD coprecessing frame)
+    # is cleaner, but seems to be inconsistent with the perspective 
+    # of previous approximans, such as the modified PhenomD 
+    # and technically PN as well. Therefore we should use the 
+    # amplitude of the TD coprecessing frame, although it is not as clean
+    # ***
+    # # scaled_amp_fd = amp_fd * amp_scale
+    # # log_scaled_amp_fd = log(scaled_amp_fd)
+    # # log_scaled_amp_popt, log_scaled_amp_pcov = curve_fit(log_scaled_template_amp, f, log_scaled_amp_fd,p0=[0,0,0,0,0])
+    scaled_amp_td = amp_td * amp_scale
+    log_scaled_amp_td = log(scaled_amp_td)
+    log_scaled_amp_popt, log_scaled_amp_pcov = curve_fit(log_scaled_template_amp, f, log_scaled_amp_td,p0=[0,0,0,0,0])
     best_fit_amp = exp(log_scaled_template_amp(f,*log_scaled_amp_popt)) * inv_amp_scale
     
     #
@@ -132,12 +140,14 @@ for j,f_ in enumerate(files):
     #subplot(1,2,2)
     sca(ax[p]); p+=1
     plot( f, phenomd_amp, label='PhenomD', ls='--',alpha=0.9,color='k',lw=2 )
-    plot( f, amp_fd, label='NR:Precessing', color='k', alpha=0.15, lw=6 )
-    plot( f, best_fit_amp, label='Best Fit', color='r', ls='-',lw=2 )
+    plot( f, amp_td, label='NR:Precessing (TD)', color='k', alpha=0.15, lw=6 )
+    plot( f, amp_fd, label='NR:Precessing (FD)', color='k', alpha=0.30, lw=6, ls=':' )
+    plot( f, best_fit_amp, label='Best Fit (TD)', color='r', ls='-',lw=2 )
     title(simname,size=12,loc='left')
     xscale('log')
     yscale('log')
     legend(ncol=2,loc=3)
+    #ylim(1e-1,2e1)
     ylabel(r'$|\tilde{h}_{22}(f)|$')
     #
     title(f_.split('/')[-1].split('.')[0],loc='left',size=12)
