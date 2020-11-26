@@ -66,16 +66,16 @@ for j,f_ in enumerate(files):
     # ---
     template_amp, template_dphi, template_phi = pwca.template_amp_phase(m1, m2, chi1, chi2, chi_p)
 
-    # PHASE 
-    # ---
+    # # PHASE 
+    # # ---
 
-    # NOTE that the td phase is used to exact consistency with the models of coprecessing angles
-    phenomd_phi = template_phi(f)
-    phi_popt, phi_pcov = curve_fit(template_phi, f, phi_td,p0=[0,0,0,0])
+    # # NOTE that the td phase is used to exact consistency with the models of coprecessing angles
+    # phenomd_phi = template_phi(f)
+    # phi_popt, phi_pcov = curve_fit(template_phi, f, phi_td,p0=[0,0,0,0])
     
-    #
-    phi_popt_array[j,:] = phi_popt
-    phi_pcov_list.append( phi_pcov )
+    # #
+    # phi_popt_array[j,:] = phi_popt
+    # phi_pcov_list.append( phi_pcov )
     
     # PHASE DERIVATIVE
     # ---
@@ -85,7 +85,7 @@ for j,f_ in enumerate(files):
     dphi_popt, dphi_pcov = curve_fit(template_dphi, f, dphi_td,p0=[0,0,0,0])
     best_fit_dphi = template_dphi(f,*dphi_popt)
     # Get the phase fit version of dphi
-    best_fit__phi  = template_dphi(f,*phi_popt)
+    # best_fit__phi  = template_dphi(f,*phi_popt)
     
     #
     dphi_popt_array[j,:] = dphi_popt
@@ -120,7 +120,7 @@ for j,f_ in enumerate(files):
     plot( f, phenomd_dphi, label='PhenomD', ls='--',alpha=0.9,color='k',lw=2 )
     plot( f, dphi_td, label='NR:Precessing', color='k', alpha=0.15, lw=6 )
     plot( f, best_fit_dphi, label='Best Fit (dphi fit)', color='r', ls='-',lw=2 )
-    plot( f, best_fit__phi, label='Best Fit (phi fit)', color='b', ls='-',lw=2 )
+    # plot( f, best_fit__phi, label='Best Fit (phi fit)', color='b', ls='-',lw=2 )
     title(simname,size=12,loc='left')
     legend(ncol=2,loc=1)
     ylabel(r'$\frac{d}{df}\arg(\tilde{h}_{22})$')
@@ -173,20 +173,20 @@ data_path = datadir+'fit_opt_dphase_parameters.txt'
 alert('Saving %s to %s'%( magenta('dphi_popt_array'), magenta(data_path)) )
 savetxt( data_path, dphi_popt_array, header='see "template_amp_phase())" in ansatz.py; columns are nu4, nu5, nu6' )
 
-# Phase fit parameters
-data_path = datadir+'fit_opt_phase_parameters.txt'
-alert('Saving %s to %s'%( magenta('dphi_popt_array'), magenta(data_path)) )
-savetxt( data_path, phi_popt_array, header='see "template_amp_phase()" in ansatz.py; columns are nu4, nu5, nu6' )
+# # Phase fit parameters
+# data_path = datadir+'fit_opt_phase_parameters.txt'
+# alert('Saving %s to %s'%( magenta('dphi_popt_array'), magenta(data_path)) )
+# savetxt( data_path, phi_popt_array, header='see "template_amp_phase()" in ansatz.py; columns are nu4, nu5, nu6' )
 
 #
 data_path = datadir+'fit_pcov_dphase.pickle'
 alert('Saving dphi_pcov_list to %s'%magenta(data_path))
 pickle.dump( dphi_pcov_list, open( data_path, "wb" ) )
 
-#
-data_path = datadir+'fit_pcov_phase.pickle'
-alert('Saving dphi_pcov_list to %s'%magenta(data_path))
-pickle.dump( dphi_pcov_list, open( data_path, "wb" ) )
+# #
+# data_path = datadir+'fit_pcov_phase.pickle'
+# alert('Saving dphi_pcov_list to %s'%magenta(data_path))
+# pickle.dump( dphi_pcov_list, open( data_path, "wb" ) )
 
 #
 data_path = datadir+'fit_pcov_amp.pickle'
