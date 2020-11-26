@@ -69,7 +69,7 @@ for j,f_ in enumerate(files):
     # PHASE 
     # ---
 
-    #
+    # NOTE that the td phase is used to exact consistency with the models of coprecessing angles
     phenomd_phi = template_phi(f)
     phi_popt, phi_pcov = curve_fit(template_phi, f, phi_td,p0=[0,0,0,0])
     
@@ -80,7 +80,7 @@ for j,f_ in enumerate(files):
     # PHASE DERIVATIVE
     # ---
 
-    #
+    # NOTE that the td phase derivative  is used to exact consistency with the models of coprecessing angles
     phenomd_dphi = template_dphi(f)
     dphi_popt, dphi_pcov = curve_fit(template_dphi, f, dphi_td,p0=[0,0,0,0])
     best_fit_dphi = template_dphi(f,*dphi_popt)
@@ -102,18 +102,10 @@ for j,f_ in enumerate(files):
     log_scaled_template_amp = lambda X,MU0,MU1,MU2,MU3,MU4: log(  template_amp(X,MU0,MU1,MU2,MU3,MU4)*amp_scale  )
     phenomd_amp = template_amp(f)
     
-    # NOTE that the fd amplitude (for FD coprecessing frame)
-    # is cleaner, but seems to be inconsistent with the perspective 
-    # of previous approximans, such as the modified PhenomD 
-    # and technically PN as well. Therefore we should use the 
-    # amplitude of the TD coprecessing frame, although it is not as clean
-    # ***
-    # # scaled_amp_fd = amp_fd * amp_scale
-    # # log_scaled_amp_fd = log(scaled_amp_fd)
-    # # log_scaled_amp_popt, log_scaled_amp_pcov = curve_fit(log_scaled_template_amp, f, log_scaled_amp_fd,p0=[0,0,0,0,0])
-    scaled_amp_td = amp_td * amp_scale
-    log_scaled_amp_td = log(scaled_amp_td)
-    log_scaled_amp_popt, log_scaled_amp_pcov = curve_fit(log_scaled_template_amp, f, log_scaled_amp_td,p0=[0,0,0,0,0])
+    # NOTE that the td amplitude is used to exact consistency with the models of coprecessing angles
+    scaled_amp = amp_td * amp_scale
+    log_scaled_amp = log(scaled_amp)
+    log_scaled_amp_popt, log_scaled_amp_pcov = curve_fit(log_scaled_template_amp, f, log_scaled_amp,p0=[0,0,0,0,0])
     best_fit_amp = exp(log_scaled_template_amp(f,*log_scaled_amp_popt)) * inv_amp_scale
     
     #

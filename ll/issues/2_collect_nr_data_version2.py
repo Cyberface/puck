@@ -22,6 +22,7 @@ import h5py
 from os import path
 import pickle
 import pwca
+from mpa import gwylmo_cpclean
 
 # Preliminaries 
 # --
@@ -78,18 +79,19 @@ for a in A:
 
     # Put in initial J frame
     frame['init-j'] = y_raw.__calc_initial_j_frame__()
-
-    # Compute TD adn FD coprecessing psi4 frames
-    frame['cp-y-fd'] = frame['init-j'].__calc_coprecessing_frame__( transform_domain='fd', kind='psi4' )
-    frame['cp-y-td'] = frame['init-j'].__calc_coprecessing_frame__( transform_domain='td', kind='psi4' )
     
-    # Symmetrise data
-    foo = dict(frame)
-    for k in frame:
-        if 'cp' in k:
-            foo['sym-'+k] = frame[k].__symmetrize__()
-    #
-    frame = foo
+    # --
+    # Compute waveforms that have been symmetrized in the psi4 coprecessing frame.
+    # NOTE that we will tag these cases with "star"
+    # --
+    
+    # Symmetrize the psi4 time domain coprecessing frame waveform, and return to the init-j frame
+    frame['star-init-j'] = gwylmo_cpclean( frame['init-j'], cp_domain='td' )
+    
+    # Calculate the coprecessing frame for the case above
+    # Compute TD adn FD coprecessing psi4 frames
+    frame['star-sym-cp-y-fd'] = frame['star-init-j'].__calc_coprecessing_frame__( transform_domain='fd', kind='psi4' )
+    frame['star-sym-cp-y-td'] = frame['star-init-j'].__calc_coprecessing_frame__( transform_domain='td', kind='psi4' )
     
     # Produce diagnostic plots 
     def plot_amp_dphi(frame):
@@ -98,52 +100,77 @@ for a in A:
         fig = figure( figsize=4*figaspect(0.8) )
 
         #
-        kind = 'strain'
+        y0,y1 = -inf,1e4
+        kind = 'psi4' # kind used to measure smoothness of phase derivate
+        D0 = mean( frame['star-sym-cp-y-fd'][2,2][kind].fd_dphi )
+        smoothness_measure = {}
+        case_test = lambda k: ('star' in k) and ( not ('init' in k) )
 
         #
-        f = frame['cp-y-td'].f
-        mask = abs(f)<0.1
+        for k in sort(frame.keys())[::-1]:
+
+            #
+            if case_test(k):
+
+                f = frame[k].f
+                mask = ((f)>0.02) & ((f)<0.06)
+                this_smoothness_measure = abs( std( frame[k][2,2][kind].fd_dphi[mask]-smooth(frame[k][2,2][kind].fd_dphi[mask]).answer ) )
+                smoothness_measure[k] = this_smoothness_measure 
 
         #
-        ax1 = subplot(2,1,1)
-        
-        k = 'td'
-        plot( frame['cp-y-'+k].f, frame['cp-y-'+k][2,2][kind].fd_amp, label=k+'-non-symmetrized', color='k', lw=2, alpha=0.15 )
-        plot( frame['sym-cp-y-'+k].f, frame['sym-cp-y-'+k][2,2][kind].fd_amp, label=k+'-symmetrized',color='k', alpha=1, lw=1 )
-        
-        k = 'fd'
-        plot( frame['cp-y-'+k].f, frame['cp-y-'+k][2,2][kind].fd_amp, label=k+'-non-symmetrized', color='b', lw=2, alpha=0.15 )
-        plot( frame['sym-cp-y-'+k].f, frame['sym-cp-y-'+k][2,2][kind].fd_amp, label=k+'-symmetrized',color='b', alpha=1, lw=1 )
-        
+        for k in sort(frame.keys())[::-1]:
+
+            #
+            if case_test(k):
+
+                #
+                is_best = smoothness_measure[k]==min(smoothness_measure.values())
+
+                #
+                alp = 1 if 'star' in k else 0.14
+                ls = ':' if not ('sym' in k) else '-'
+                ls = '-.' if ('td' in k) and not ('star' in k) else ls
+                lw = 2
+
+                #
+                ax1 = subplot(2,1,1)
+                kind = 'strain'
+                f = frame[k].f
+                mask = abs(f)<0.1
+                ln = plot( f, frame[k][2,2][kind].fd_amp, label=k, alpha=1 if is_best else 0.2, ls=ls if not is_best else '-', lw=lw if not is_best else 2 )
+                #ln = plot( f, frame[k][2,2][kind].fd_amp, label=k, alpha=alp, ls=ls, lw=lw )
+                ylabel(r'$|\tilde{h}_{22}|$')
+                yscale('log')
+                xlabel('$fM$')
+                xscale('log')
+                xlim( 0.008, 0.115 )
+                ylim( 1e0,1e2 )
+                legend(ncol=2)
+
+                #
+                ax2 = subplot(2,1,2)
+                f = frame[k].f
+                mask = ((f)>0.02) & ((f)<0.06)
+                kind = 'psi4'
+                #smoothness_measure = abs( std( frame[k][2,2][kind].fd_dphi[mask]-smooth(frame[k][2,2][kind].fd_dphi[mask]).answer ) )
+                if True: #smoothness_measure[k]<10:
+                    plot( f, frame[k][2,2][kind].fd_dphi-D0, label=k, alpha=1 if is_best else 0.2, ls=ls if not is_best else '-', lw=lw if not is_best else 2, color=ln[0].get_color() )
+                    xlabel('$fM$')
+                    xlim( 0.02, 0.11 )
+                    ya,yb = lim( frame[k][2,2][kind].fd_dphi[mask]-D0 )
+                    y0 = max( ya,y0 )
+                    y1 = min( yb,y1 )
+                    b = 0.25*abs(y1-y0)
+                    ylim( y0-b,y1+b )
+                #
+                legend(ncol=2)
+                xlabel('$fM$')
+                ylabel(r'$\frac{d}{df}\arg(\tilde{\psi}_4)$')
+
+
+        #
+        subplot(2,1,1)
         title(y_raw.simname)
-        ylabel(r'$|\tilde{h}_{22}|$')
-
-        #
-        yscale('log')
-        xscale('log')
-        legend()
-        xlabel('$fM$')
-
-        #
-        kind = 'psi4'
-
-        #
-        ax2=subplot(2,1,2,sharex=ax1)
-        
-        k = 'td'
-        plot( frame['cp-y-'+k].f, frame['cp-y-'+k][2,2][kind].fd_dphi, label=k+'-non-symmetrized', color='k', lw=2, alpha=0.15 )
-        plot( frame['sym-cp-y-'+k].f, frame['sym-cp-y-'+k][2,2][kind].fd_dphi, label=k+'-symmetrized',color='k', alpha=1, lw=1 )
-        
-        k = 'fd'
-        plot( frame['cp-y-'+k].f, frame['cp-y-'+k][2,2][kind].fd_dphi, label=k+'-non-symmetrized', color='b', lw=2, alpha=0.15 )
-        plot( frame['sym-cp-y-'+k].f, frame['sym-cp-y-'+k][2,2][kind].fd_dphi, label=k+'-symmetrized',color='b', alpha=1, lw=1 )
-
-        #
-        xscale('log')
-        xlim( 0.005, 0.3 )
-        ylim( frame['cp-y-'+k][2,2]['strain'].fd_dphi[mask][-1]-250,frame['cp-y-'+k][2,2]['strain'].fd_dphi[mask][-1]+500 )
-        xlabel('$fM$')
-        ylabel(r'$\frac{d}{df}\arg(\tilde{h}_{22})$');
         
         #
         return fig,[ax1,ax2]
@@ -158,18 +185,18 @@ for a in A:
     f = frame['raw'].f
     mask = (f>0.03) & (f<0.12) 
     
-    fd_amp  = frame['sym-cp-y-fd'][2,2]['strain'].fd_amp
-    fd_dphi = frame['sym-cp-y-fd'][2,2]['psi4'].fd_dphi
-    fd_phi = frame['sym-cp-y-fd'][2,2]['psi4'].fd_phi
+    fd_amp  = frame['star-sym-cp-y-fd'][2,2]['strain'].fd_amp
+    fd_dphi = frame['star-sym-cp-y-fd'][2,2]['psi4'].fd_dphi
+    fd_phi = frame['star-sym-cp-y-fd'][2,2]['psi4'].fd_phi
     #
     shift = min(smooth(fd_dphi[mask]).answer)
     fd_dphi -= shift
     fd_phi  -= f * shift
     fd_phi -= fd_phi[ sum(f<0.03)-1+argmin(smooth(fd_dphi[mask]).answer) ]
     
-    td_amp  = frame['sym-cp-y-td'][2,2]['strain'].fd_amp
-    td_dphi = frame['sym-cp-y-td'][2,2]['psi4'].fd_dphi
-    td_phi = frame['sym-cp-y-td'][2,2]['psi4'].fd_phi
+    td_amp  = frame['star-sym-cp-y-td'][2,2]['strain'].fd_amp
+    td_dphi = frame['star-sym-cp-y-td'][2,2]['psi4'].fd_dphi
+    td_phi = frame['star-sym-cp-y-td'][2,2]['psi4'].fd_phi
     #
     shift = min(smooth(td_dphi[mask]).answer)
     td_dphi -= shift
