@@ -65,13 +65,23 @@ for j,f_ in enumerate(files):
     # GENERATE TEMPLATE FUNCTIONS
     # ---
     template_amp, template_dphi, template_phi = pwca.template_amp_phase(m1, m2, chi1, chi2, chi_p)
+    
+    # DEFINE DATA TO USE FOR CALIBRATION
+    # --- 
+    CALIBRATION_PHI  = phi_fd
+    CALIBRATION_DPHI = dphi_fd
+    CALIBRATION_AMP  = amp_fd
+    # CALIBRATION_PHI  = phi_td
+    # CALIBRATION_DPHI = dphi_td
+    # CALIBRATION_AMP  = amp_td
+    
 
     # PHASE 
     # ---
 
     # NOTE that the td phase is used to exact consistency with the models of coprecessing angles
     phenomd_phi = template_phi(f)
-    phi_popt, phi_pcov = curve_fit(template_phi, f, phi_td,p0=[0,0,0,0])
+    phi_popt, phi_pcov = curve_fit(template_phi, f, CALIBRATION_PHI,p0=[0,0,0,0])
     
     #
     phi_popt_array[j,:] = phi_popt
@@ -82,7 +92,7 @@ for j,f_ in enumerate(files):
 
     # NOTE that the td phase derivative  is used to exact consistency with the models of coprecessing angles
     phenomd_dphi = template_dphi(f)
-    dphi_popt, dphi_pcov = curve_fit(template_dphi, f, dphi_td,p0=[0,0,0,0])
+    dphi_popt, dphi_pcov = curve_fit(template_dphi, f, CALIBRATION_DPHI,p0=[0,0,0,0])
     best_fit_dphi = template_dphi(f,*dphi_popt)
     # Get the phase fit version of dphi
     best_fit__phi  = template_dphi(f,*phi_popt)
@@ -103,7 +113,7 @@ for j,f_ in enumerate(files):
     phenomd_amp = template_amp(f)
     
     # NOTE that the td amplitude is used to exact consistency with the models of coprecessing angles
-    scaled_amp = amp_td * amp_scale
+    scaled_amp = CALIBRATION_AMP * amp_scale
     log_scaled_amp = log(scaled_amp)
     log_scaled_amp_popt, log_scaled_amp_pcov = curve_fit(log_scaled_template_amp, f, log_scaled_amp,p0=[0,0,0,0,0])
     best_fit_amp = exp(log_scaled_template_amp(f,*log_scaled_amp_popt)) * inv_amp_scale
@@ -118,7 +128,8 @@ for j,f_ in enumerate(files):
     #subplot(1,2,1)
     sca(ax[p]); p+=1
     plot( f, phenomd_dphi, label='PhenomD', ls='--',alpha=0.9,color='k',lw=2 )
-    plot( f, dphi_td, label='NR:Precessing', color='k', alpha=0.15, lw=6 )
+    plot( f, dphi_td, label='NR:Precessing (TD)', color='k', alpha=0.15, lw=6 )
+    plot( f, dphi_fd, label='NR:Precessing (FD)', color='k', alpha=0.30, lw=6, ls=':' )
     plot( f, best_fit_dphi, label='Best Fit (dphi fit)', color='r', ls='-',lw=2 )
     plot( f, best_fit__phi, label='Best Fit (phi fit)', color='b', ls='-',lw=2 )
     title(simname,size=12,loc='left')
