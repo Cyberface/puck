@@ -79,7 +79,8 @@ for a in A:
 
     # Put in initial J frame
     frame['init-j'] = y_raw.__calc_initial_j_frame__()
-    frame['j-of-t'] = frame['init-j'].__calc_j_of_t_frame__()
+    # # # NOTE that although the angles model uses the j(t) frame, the do NOT use this here as the coprecessing frame is uniquely defined and the j(t) frame only adds problematic noise
+    # # frame['j-of-t'] = frame['init-j'].__calc_j_of_t_frame__()
     
     # --
     # Compute waveforms that have been symmetrized in the psi4 coprecessing frame.
@@ -87,12 +88,12 @@ for a in A:
     # --
     
     # Symmetrize the psi4 time domain coprecessing frame waveform, and return to the init-j frame
-    frame['star-j-of-t'] = gwylmo_cpclean( frame['j-of-t'], cp_domain='td' )
+    frame['star-init-j'] = gwylmo_cpclean( frame['init-j'], cp_domain='td' )
     
     # Calculate the coprecessing frame for the case above
     # Compute TD adn FD coprecessing psi4 frames
-    frame['star-sym-cp-y-fd'] = frame['star-j-of-t'].__calc_coprecessing_frame__( transform_domain='fd', kind='psi4' )
-    frame['star-sym-cp-y-td'] = frame['star-j-of-t'].__calc_coprecessing_frame__( transform_domain='td', kind='psi4' )
+    frame['star-sym-cp-y-fd'] = frame['star-init-j'].__calc_coprecessing_frame__( transform_domain='fd', kind='psi4' )
+    frame['star-sym-cp-y-td'] = frame['star-init-j'].__calc_coprecessing_frame__( transform_domain='td', kind='psi4' )
     
     # Produce diagnostic plots 
     def plot_amp_dphi(frame):
