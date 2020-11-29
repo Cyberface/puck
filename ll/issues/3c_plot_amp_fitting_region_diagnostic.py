@@ -43,7 +43,7 @@ for k in range(len(data)):
     sca( ax[k] )
 
     #
-    f,amp_td,amp_fd,dphi_td,dphi_fd = data[k]
+    f,amp_td,amp_fd,dphi_td,dphi_fd,phi_td,phi_fd = data[k]
     
     #
     new_data,new_knot,new_fmin,new_fmax,_ = determine_data_fitting_region(data[k])

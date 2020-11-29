@@ -44,7 +44,7 @@ for k in range(len(data)):
     sca( ax[k] )
 
     #
-    f,amp_td,amp_fd,dphi_td,dphi_fd = data[k]
+    f,amp_td,amp_fd,dphi_td,dphi_fd,phi_td,phi_fd = data[k]
     
     #
     fmin,fmax = 0.03, 0.12
