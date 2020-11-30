@@ -14,8 +14,8 @@ basedir=/Users/book/KOALA/puck/ll/issues
 
 # Optional diagnostic potting
 # --
-$basedir/3c_plot_amp_fitting_region_diagnostic.py
-$basedir/3d_plot_dphi_fitting_region_diagnostic.py
+# $basedir/3c_plot_amp_fitting_region_diagnostic.py
+# $basedir/3d_plot_dphi_fitting_region_diagnostic.py
 
 # Fit model parameters across physical parameter space and then document
 # --
@@ -25,4 +25,4 @@ $basedir/3d_plot_dphi_fitting_region_diagnostic.py
 # Generate late stage diagnostic plots
 # --
 # $basedir/5a_plot_comparisons.py
-# $basedir/5b_phase_function_diagnostic.py
+$basedir/5b_phase_function_diagnostic.py

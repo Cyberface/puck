@@ -460,13 +460,13 @@ def generate_pwca_waveform_helper( f, theta, eta, a1, chi1, chi2, chi_p,fref=0 )
     template_amp,_,_  = template_amp_phase(  m1, m2, chi1, chi2, chi_p, fref=fref )
     
     # Generate model parameters
-    mu0,mu1,mu2,mu3,mu4,nu4,nu5,nu6,zeta2 = generate_model_params(theta,eta,a1)
+    mu1,mu2,mu3,mu4,nu4,nu5,nu6,zeta2 = generate_model_params(theta,eta,a1)
     
     # Evaluate phase model 
     model_phi     = pwca_phi_helper( f, theta, eta, a1, chi1, chi2, chi_p, nu4, nu5, nu6, zeta2, fref=fref )
     # Evaluate amplitude model
     scale_factor = 1
-    model_amp     = template_amp( f, mu0, mu1, mu2, mu3, mu4 ) * scale_factor
+    model_amp     = template_amp( f, mu1, mu2, mu3, mu4 ) * scale_factor
     
     # Compute complex waveform
     # NOTE minus sign added to be consistent with external phase conventions
@@ -515,14 +515,14 @@ def generate_pwca_waveform( f, m1, m2, X1, X2, L, fref=0 ):
     
     # Generate model parameters
     eta = m1*m2/((m1+m2)**2)
-    mu0,mu1,mu2,mu3,mu4,nu4,nu5,nu6,zeta2 = generate_model_params(theta,eta,a1)
+    mu1,mu2,mu3,mu4,nu4,nu5,nu6,zeta2 = generate_model_params(theta,eta,a1)
     
     # Evaluate phase model 
     model_phi     = pwca_phi( f, m1, m2, chi1, chi2, chi_p, nu4, nu5, nu6, zeta2, fref=fref )
     
     # Evaluate amplitude model
     scale_factor = 1
-    model_amp     = template_amp( f, mu0, mu1, mu2, mu3, mu4 ) * scale_factor
+    model_amp     = template_amp( f, mu1, mu2, mu3, mu4 ) * scale_factor
     
     # Compute complex waveform
     # NOTE minus sign added to be consistent with external phase conventions

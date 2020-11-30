@@ -52,7 +52,7 @@ for a in pwca_catalog:
     # extract useful params from scentry object
     theta,m1,m2,eta,delta,chi_eff,chi_p,chi1,chi2,a1,a2 = select_scenty_metadata(a)
     # generate model parameters 
-    mu0,mu1,mu2,mu3,mu4,nu4,nu5,nu6,zeta2 = generate_model_params(theta,eta,a1)
+    mu1,mu2,mu3,mu4,nu4,nu5,nu6,zeta2 = generate_model_params(theta,eta,a1)
 
     # generate template functions
     _, template_dphi, _ = pwca.template_amp_phase(m1, m2, chi1, chi2, chi_p)
