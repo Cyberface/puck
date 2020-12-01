@@ -26,7 +26,7 @@ alert('Metadata dictionary for calibration runs stored to %s'%magenta('"pwca.met
 catalog_paper_md_path = data_dir+'catalog_paper_metadata.json'
 with open(catalog_paper_md_path, 'r') as f:
     catalog_paper_metadata = json.load(f)
-alert('Metadata dictionary for Ed\'s catalog paper stoed to %s'%magenta('"pwca.catalog_paper_metadata"'),fname='pwca.core')
+alert('Metadata dictionary for Ed\'s catalog paper stored to %s'%magenta('"pwca.catalog_paper_metadata"'),fname='pwca.core')
 
 # Function to determine version2 data fitting region
 def determine_data_fitting_region( data, fmin=0.03, fmax=0.12 ):
@@ -460,13 +460,13 @@ def generate_pwca_waveform_helper( f, theta, eta, a1, chi1, chi2, chi_p,fref=0 )
     template_amp,_,_  = template_amp_phase(  m1, m2, chi1, chi2, chi_p, fref=fref )
     
     # Generate model parameters
-    mu1,mu2,mu3,mu4,nu4,nu5,nu6,zeta2 = generate_model_params(theta,eta,a1)
+    mu2,mu4,nu4,nu5,nu6,zeta2 = generate_model_params(theta,eta,a1)
     
     # Evaluate phase model 
     model_phi     = pwca_phi_helper( f, theta, eta, a1, chi1, chi2, chi_p, nu4, nu5, nu6, zeta2, fref=fref )
     # Evaluate amplitude model
     scale_factor = 1
-    model_amp     = template_amp( f, mu1, mu2, mu3, mu4 ) * scale_factor
+    model_amp     = template_amp( f, mu2, mu4 ) * scale_factor
     
     # Compute complex waveform
     # NOTE minus sign added to be consistent with external phase conventions
@@ -515,14 +515,14 @@ def generate_pwca_waveform( f, m1, m2, X1, X2, L, fref=0 ):
     
     # Generate model parameters
     eta = m1*m2/((m1+m2)**2)
-    mu1,mu2,mu3,mu4,nu4,nu5,nu6,zeta2 = generate_model_params(theta,eta,a1)
+    mu2,mu4,nu4,nu5,nu6,zeta2 = generate_model_params(theta,eta,a1)
     
     # Evaluate phase model 
     model_phi     = pwca_phi( f, m1, m2, chi1, chi2, chi_p, nu4, nu5, nu6, zeta2, fref=fref )
     
     # Evaluate amplitude model
     scale_factor = 1
-    model_amp     = template_amp( f, mu1, mu2, mu3, mu4 ) * scale_factor
+    model_amp     = template_amp( f, mu2, mu4 ) * scale_factor
     
     # Compute complex waveform
     # NOTE minus sign added to be consistent with external phase conventions

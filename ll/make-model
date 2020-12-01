@@ -5,17 +5,17 @@ basedir=/Users/book/KOALA/puck/ll/issues
 
 # Collection of NR data
 # --
-# $basedir/2_collect_nr_data_version2.py
-
-# Fit waveforms and organize metadata
-# --
-# $basedir/3a_collect_metadata.py
-# $basedir/3b_fit_waveforms.py
+# # $basedir/2_collect_nr_data_version2.py
 
 # Optional diagnostic potting
 # --
+# $basedir/3a_collect_metadata.py
 # $basedir/3c_plot_amp_fitting_region_diagnostic.py
 # $basedir/3d_plot_dphi_fitting_region_diagnostic.py
+
+# Fit waveforms and organize metadata
+# --
+# $basedir/3b_fit_waveforms.py
 
 # Fit model parameters across physical parameter space and then document
 # --
@@ -24,5 +24,5 @@ basedir=/Users/book/KOALA/puck/ll/issues
 
 # Generate late stage diagnostic plots
 # --
-# $basedir/5a_plot_comparisons.py
+$basedir/5a_plot_comparisons.py
 $basedir/5b_phase_function_diagnostic.py

@@ -37,7 +37,7 @@ nu4,nu5,nu6,zeta2 = dphi_range.T
 
 # Load and unpuack physical parameter space -- amp
 amp_range = loadtxt(datadir+'fit_opt_amplitude_parameters.txt')
-mu1, mu2, mu3, mu4 = amp_range.T
+mu2, mu4 = amp_range.T
 
 #
 foo = {}
@@ -92,18 +92,18 @@ foo[key] = gmvpfit( model_domain, zeta2,fitatol=0.0001,verbose=True,maxdeg_list=
 '''
 alert('Fitting amplitude parameters ...',header=True)
 
-# mu1 
-# ---
-key = 'mu1'
-foo[key] = gmvpfit( model_domain, mu1,fitatol=0.001,verbose=True,maxdeg_list=[4,0,3,1],center=True,estatol=0.015)
+# # mu1 
+# # ---
+# key = 'mu1'
+# foo[key] = gmvpfit( model_domain, mu1,fitatol=0.001,verbose=True,maxdeg_list=[4,0,3,1],center=True,estatol=0.015)
 # mu2
 # ---
 key = 'mu2'
-foo[key] = gmvpfit( model_domain, mu2,fitatol=0.001,verbose=True,maxdeg_list=[3,2,0,1],center=True)
-# mu3
-# ---
-key = 'mu3'
-foo[key] = gmvpfit( model_domain, mu3,fitatol=0.0001,verbose=True,maxdeg_list=[4,3,0,1],center=True,estatol=0.005)
+foo[key] = gmvpfit( model_domain, mu2,fitatol=0.001,verbose=True,maxdeg_list=[4,3,0,1],center=True)
+# # mu3
+# # ---
+# key = 'mu3'
+# foo[key] = gmvpfit( model_domain, mu3,fitatol=0.0001,verbose=True,maxdeg_list=[4,3,0,1],center=True,estatol=0.005)
 # mu4
 # ---
 key = 'mu4'

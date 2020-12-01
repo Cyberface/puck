@@ -34,7 +34,7 @@ foo = {}
 
 #
 p = 0
-amp_popt_array  = zeros( (len(files), 4) )
+amp_popt_array  = zeros( (len(files),2) )
 phi_popt_array  = zeros( (len(files),4) )
 dphi_popt_array = zeros( (len(files),4) )
 amp_pcov_list, dphi_pcov_list, phi_pcov_list = [],[],[]
@@ -68,24 +68,24 @@ for j,f_ in enumerate(files):
     
     # DEFINE DATA TO USE FOR CALIBRATION
     # --- 
-    CALIBRATION_PHI  = phi_fd
-    CALIBRATION_DPHI = dphi_fd
-    CALIBRATION_AMP  = amp_fd
-    # CALIBRATION_PHI  = phi_td
-    # CALIBRATION_DPHI = dphi_td
-    # CALIBRATION_AMP  = amp_td
+    # CALIBRATION_PHI  = phi_fd
+    # CALIBRATION_DPHI = dphi_fd
+    # CALIBRATION_AMP  = amp_fd
+    CALIBRATION_PHI  = phi_td
+    CALIBRATION_DPHI = dphi_td
+    CALIBRATION_AMP  = amp_td
     
 
-    # # PHASE 
-    # # ---
+    # PHASE 
+    # ---
 
-    # # NOTE that the td phase is used to exact consistency with the models of coprecessing angles
-    # phenomd_phi = template_phi(f)
-    # phi_popt, phi_pcov = curve_fit(template_phi, f, CALIBRATION_PHI,p0=[0,0,0,0])
+    # NOTE that the td phase is used to exact consistency with the models of coprecessing angles
+    phenomd_phi = template_phi(f)
+    phi_popt, phi_pcov = curve_fit(template_phi, f, CALIBRATION_PHI,p0=[0,0,0,0])
     
-    # #
-    # phi_popt_array[j,:] = phi_popt
-    # phi_pcov_list.append( phi_pcov )
+    #
+    phi_popt_array[j,:] = phi_popt
+    phi_pcov_list.append( phi_pcov )
     
     # PHASE DERIVATIVE
     # ---
@@ -95,7 +95,7 @@ for j,f_ in enumerate(files):
     dphi_popt, dphi_pcov = curve_fit(template_dphi, f, CALIBRATION_DPHI,p0=[0,0,0,0])
     best_fit_dphi = template_dphi(f,*dphi_popt)
     # Get the phase fit version of dphi
-    # best_fit__phi  = template_dphi(f,*phi_popt)
+    best_fit__phi  = template_dphi(f,*phi_popt)
     
     #
     dphi_popt_array[j,:] = dphi_popt
@@ -109,13 +109,13 @@ for j,f_ in enumerate(files):
     inv_amp_scale = f ** (-7.0/6)
     
     #
-    log_scaled_template_amp = lambda X,MU1,MU2,MU3,MU4: log(  template_amp(X,MU1,MU2,MU3,MU4)*amp_scale  )
+    log_scaled_template_amp = lambda X,MU2,MU4: log(  template_amp(X,MU2,MU4)*amp_scale  )
     phenomd_amp = template_amp(f)
     
     # NOTE that the td amplitude is used to exact consistency with the models of coprecessing angles
     scaled_amp = CALIBRATION_AMP * amp_scale
     log_scaled_amp = log(scaled_amp)
-    log_scaled_amp_popt, log_scaled_amp_pcov = curve_fit(log_scaled_template_amp, f, log_scaled_amp,p0=[0,0,0,0])
+    log_scaled_amp_popt, log_scaled_amp_pcov = curve_fit(log_scaled_template_amp, f, log_scaled_amp,p0=[0,0])
     best_fit_amp = exp(log_scaled_template_amp(f,*log_scaled_amp_popt)) * inv_amp_scale
     
     #
