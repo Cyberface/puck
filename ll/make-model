@@ -19,8 +19,8 @@ basedir=/Users/book/KOALA/puck/ll/issues
 
 # Fit model parameters across physical parameter space and then document
 # --
-# $basedir/4a_fit_hyper_parameters.py
-# $basedir/4b_document_fits.py
+$basedir/4a_fit_hyper_parameters.py
+$basedir/4b_document_fits.py
 
 # Generate late stage diagnostic plots
 # --

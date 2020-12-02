@@ -68,24 +68,26 @@ for j,f_ in enumerate(files):
     
     # DEFINE DATA TO USE FOR CALIBRATION
     # --- 
-    # CALIBRATION_PHI  = phi_fd
-    # CALIBRATION_DPHI = dphi_fd
-    # CALIBRATION_AMP  = amp_fd
-    CALIBRATION_PHI  = phi_td
-    CALIBRATION_DPHI = dphi_td
-    CALIBRATION_AMP  = amp_td
+    
+    CALIBRATION_PHI  = phi_fd
+    CALIBRATION_DPHI = dphi_fd
+    CALIBRATION_AMP  = amp_fd
+    
+    # CALIBRATION_PHI  = phi_td
+    # CALIBRATION_DPHI = dphi_td
+    # CALIBRATION_AMP  = amp_td
     
 
-    # PHASE 
-    # ---
+    # # PHASE 
+    # # ---
 
-    # NOTE that the td phase is used to exact consistency with the models of coprecessing angles
-    phenomd_phi = template_phi(f)
-    phi_popt, phi_pcov = curve_fit(template_phi, f, CALIBRATION_PHI,p0=[0,0,0,0])
+    # # NOTE that the td phase is used to exact consistency with the models of coprecessing angles
+    # phenomd_phi = template_phi(f)
+    # phi_popt, phi_pcov = curve_fit(template_phi, f, CALIBRATION_PHI,p0=[0,0,0,0])
     
-    #
-    phi_popt_array[j,:] = phi_popt
-    phi_pcov_list.append( phi_pcov )
+    # #
+    # phi_popt_array[j,:] = phi_popt
+    # phi_pcov_list.append( phi_pcov )
     
     # PHASE DERIVATIVE
     # ---
@@ -95,7 +97,7 @@ for j,f_ in enumerate(files):
     dphi_popt, dphi_pcov = curve_fit(template_dphi, f, CALIBRATION_DPHI,p0=[0,0,0,0])
     best_fit_dphi = template_dphi(f,*dphi_popt)
     # Get the phase fit version of dphi
-    best_fit__phi  = template_dphi(f,*phi_popt)
+    # best_fit__phi  = template_dphi(f,*phi_popt)
     
     #
     dphi_popt_array[j,:] = dphi_popt
