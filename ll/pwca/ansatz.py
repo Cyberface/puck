@@ -1,6 +1,6 @@
 
 #
-def template_amp_phase(m1, m2, chi1, chi2, chip,fref=0):
+def template_amp_phase(m1, m2, chi1, chi2, chip, Mtotal=None, fref=None, phiRef=None ):
     '''
     Given system masses and L-parallel dimensionless spins, output amplitude and phase methods. 
     
@@ -15,8 +15,16 @@ def template_amp_phase(m1, m2, chi1, chi2, chip,fref=0):
     from numpy import array
     import pwca, phenom
     
+    if (fref != None) and (phiRef != None):
+        assert (Mtotal != None)
+    
+    if isinstance(Mtotal,(float,int)):
+        Mtotal_old = m1+m2
+        m1 = m1 * Mtotal / Mtotal_old
+        m2 = m2 * Mtotal / Mtotal_old
+    
     # Create PrototypePhenomDCoprecess instance (PhenomD Object -- PDO)
-    pdo = phenom.PrototypePhenomDCoprecess(m1=m1, m2=m2, chi1z=chi1, chi2z=chi2,fRef=fref)
+    pdo = phenom.PrototypePhenomDCoprecess(m1=m1, m2=m2, chi1z=chi1, chi2z=chi2,fRef=fref, phiRef=phiRef)
     
     #
     def template_amp( f, mu2=0, mu4=0 ):
@@ -59,15 +67,15 @@ def template_amp_phase(m1, m2, chi1, chi2, chip,fref=0):
         pdo.model_pars = pdo.compute_model_parameters( pdo.p, pdo.__finspin_func_string__, nu4=nu4, nu5=nu5, nu6=nu6, zeta2=zeta2, chip=chip )
         
         #
-        pdo_phi  = array( [pdo.IMRPhenomDPhase(k,pdo.p['eta'], pdo.model_pars, UsefulPowers(k)) for k in f] )
+        pdo_phi  = array( [pdo.IMRPhenomDPhase(k,pdo.p['eta'], pdo.model_pars, UsefulPowers(k)) - (pdo.model_pars['t0']*(k-pdo.model_pars['MfRef']) + pdo.model_pars['phi_precalc']) for k in f] )
         
         #
-        dphi = spline_diff(f,pdo_phi)
-        shift_id = sum(f<0.03) + argmax( dphi[ (f>=0.03) & (f<=0.12) ] )
-        shift = dphi[shift_id]
-        pdo_phi -= f*shift
-        pdo_phi -= pdo_phi[shift_id]
-        pdo_phi *= -1
+#         dphi = spline_diff(f,pdo_phi)
+#         shift_id = sum(f<0.03) + argmax( dphi[ (f>=0.03) & (f<=0.12) ] )
+#         shift = dphi[shift_id]
+#         pdo_phi -= f*shift
+#         pdo_phi -= pdo_phi[shift_id]
+#         pdo_phi *= -1
         
         #
         return pdo_phi
