@@ -28,6 +28,131 @@ with open(catalog_paper_md_path, 'r') as f:
     catalog_paper_metadata = json.load(f)
 alert('Metadata dictionary for Ed\'s catalog paper stored to %s'%magenta('"pwca.catalog_paper_metadata"'),fname='pwca.core')
 
+
+#
+def pwca_remnant(theta_radians, eta, a1):
+    
+    '''
+    Use fits developed in issue_6_remnants ipython notebook to determine mass and spin (magnitude)
+    '''
+
+    # Import usefuls
+    from numpy import sqrt,cos
+    from positive import eta2m1m2,Mf161100332,jf161100332
+    from pwca.final_spin_rational_sigma_function import final_spin_rational_sigma_function
+    from pwca.final_spin_polynomial_sigma_function import final_spin_polynomial_sigma_function
+    from pwca.final_mass_polynomial_rho_function import final_mass_polynomial_rho_function
+    
+    # Calc delta
+    delta = sqrt(1-4*eta)
+ 
+    #
+    u = cos(theta_radians)
+    
+    #
+    chi_eff, chi_p = parama_party( eta,theta_radians,a1 )
+    m1,m2 = eta2m1m2(eta)
+    chi1 = chi_eff / m1
+    chi2 = 0
+    
+    #
+    MfNP = Mf161100332(m1,m2,chi1,chi2)
+    jfNP = jf161100332(m1,m2,chi1,chi2)
+    
+    #
+    sigma_polynomial = final_spin_polynomial_sigma_function(u,eta,delta,a1)
+    #
+    sigma_rational = final_spin_rational_sigma_function(u,eta,delta,a1)
+    #
+    rho_polynomial = final_mass_polynomial_rho_function(u,eta,delta,a1)
+    
+    #
+    Mf_polynomial = MfNP + chi_p * rho_polynomial
+    jf_polynomial = jfNP + chi_p * sigma_polynomial
+    jf_rational   = jfNP + chi_p * sigma_rational
+    
+    #
+    return Mf_polynomial,jf_polynomial,jf_rational,MfNP,jfNP
+    
+
+#
+def pwca_rdcf( theta, eta, a1, chi1, chi2, chip, d=False, mod=False,alpha5_scale=False, fixd=False, __retro__=False ):
+    
+    '''
+    Method to compute the final (complex) RD frequencies used in PhenomDCP
+    
+    INPUT: theta_L_S_init, eta, a1, chi1, chi2, chip
+    * NOTE that all quantities must be made self-consistent by the USER
+    
+    OUTPUT: cf_amp,cf_pha
+    * cf_amp,   the complex frequency fring + 1j * fdamp use in DCP's
+                amplitude model
+    * cf_pha,   the complex frequency fring + 1j * pha use in DCP's
+                phase model
+    
+    '''
+    
+    # Import usefuls 
+    #from pwca import FinalSpin0815,fring,fdamp
+    from phenom.utils.remnant import fring, fdamp, FinalSpin0815, FinalSpinIMRPhenomD_all_in_plane_spin_on_larger_BH
+    from positive import eta2m1m2
+    from pwca import alpha5 as alpha5_fit
+    
+    #
+    if (not d) and (not mod):
+        mu2,mu4,nu4,nu5,nu6,zeta2 = pwca.generate_model_params(theta,eta,a1)
+    elif d or mod:
+        mu4=nu5=nu6=0
+    # elif mod:
+        
+    
+    # Get PhenomD fring and fdamp 
+    d_af    = FinalSpin0815( eta, chi1, chi2 )
+    #
+    if mod:
+        m1,m2 = eta2m1m2(eta)
+        d_af = FinalSpinIMRPhenomD_all_in_plane_spin_on_larger_BH(m1, m2, chip, chi1, chi2)
+        #
+        if fixd:
+            d_af = abs(d_af)
+        #print('>> ',d_af)
+    # NOTE that here the final mass is accounted for internally
+    if __retro__: d_af = -abs(d_af)
+    d_fring = fring( eta, chi1, chi2, d_af )
+    d_fdamp = fdamp( eta, chi1, chi2, d_af )
+    
+    #
+    mu3 = 0
+    
+    # Calculate the AMPLITUDE frequencies for DCP 
+    dcp_amp_fring = d_fring + chip*mu4 # same structurally as nu5
+    dcp_amp_fdamp = d_fdamp + chip*mu3 # same structurally as nu6
+    
+    # Calculate the PHASE frequencies for DCP 
+    dcp_pha_fring = d_fring + chip*nu5 # same structurally as mu4
+    # print 'A>> ',dcp_pha_fring
+    dcp_pha_fdamp = d_fdamp + chip*nu6 # same structurally as mu3
+    
+    # Store complex values 
+    cf_amp = dcp_amp_fring + 1j * dcp_amp_fdamp
+    cf_pha = dcp_pha_fring + 1j * dcp_pha_fdamp
+    
+    #
+    if alpha5_scale:
+        m1_,m2_ = eta2m1m2(eta)
+        m1 = max(m1_,m2_)
+        m2 = min(m1_,m2_)
+        s = (m1*chi1 + m2*chi2)/(m1+m2)
+        alpha5 = alpha5_fit(eta,s)
+        #print alpha5
+        #cf_amp,cf_pha = ( k*alpha5 for k in [cf_amp,cf_pha] )
+        cf_pha = cf_pha*alpha5
+    
+    # Return answers
+    return (cf_amp,cf_pha)
+    
+    
+
 # Function to determine version2 data fitting region
 def determine_data_fitting_region( data, fmin=0.03, fmax=0.12 ):
     '''
@@ -390,7 +515,7 @@ def pwca_phi_helper(f, theta, eta, a1, chi1, chi2, chip, nu4, nu5, nu6, zeta2, p
     
     # Generate model parameters
     if (nu4 is None) or (nu5 is None) or (nu6 is None) or (zeta2 is None):
-        _,_,_,_,_,nu4,nu5,nu6,zeta2 = pwca.generate_model_params(theta,eta,a1)
+        mu2,mu4,nu4,nu5,nu6,zeta2 = pwca.generate_model_params(theta,eta,a1)
     
     # NOTE that the minus sign signals the phase convention used internally
     m1,m2 = eta2m1m2(eta)
@@ -398,6 +523,32 @@ def pwca_phi_helper(f, theta, eta, a1, chi1, chi2, chip, nu4, nu5, nu6, zeta2, p
     phi = phi0  -  template_phi( f, nu4, nu5, nu6, zeta2 )
     
     return phi
+
+#
+def pwca_dphi_helper(f, theta, eta, a1, chi1, chi2, chip, nu4=None, nu5=None, nu6=None, zeta2=None, fref=0):
+    
+    """
+    Same as pwca_phi but with input being actual parameters used for model.
+    Generate phase of merger-ringown FD waveform.
+    Adapted from equation 14 arXiv:1508.07253, and made to be consistent with template_dphi_mrd() in the pwca package.
+    londonl@mit.edu/pilondon2@gmail.com 2020
+    """
+    
+    # Import usefuls
+    from numpy import exp,sqrt,pi,ndarray,arctan,cos
+    import pwca, phenom
+    from positive import eta2m1m2
+    
+    # Generate model parameters
+    if (nu4 is None) or (nu5 is None) or (nu6 is None) or (zeta2 is None):
+        mu2,mu4,nu4,nu5,nu6,zeta2 = pwca.generate_model_params(theta,eta,a1)
+    
+    # NOTE that the minus sign signals the phase convention used internally
+    m1,m2 = eta2m1m2(eta)
+    _,template_dphi,_ = pwca.template_amp_phase(m1, m2, chi1, chi2, chip, fref=fref)
+    dphi = template_dphi( f, nu4, nu5, nu6, zeta2 )
+    
+    return dphi
 
 
 #
