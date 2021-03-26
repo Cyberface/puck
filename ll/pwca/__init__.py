@@ -16,3 +16,6 @@ from . d import *
 from . ansatz import *
 from . core import *
 from . parameter_space_fits import *
+from . final_mass_polynomial_rho_function import *
+from . final_spin_polynomial_sigma_function import *
+from . final_spin_rational_sigma_function import *

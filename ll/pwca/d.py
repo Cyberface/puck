@@ -205,7 +205,7 @@ def fring(eta, chi1, chi2, finspin):
     if (finspin > 1.0):
         print("PhenomD fring function: final spin > 1.0 not supported\n")
 
-    ifring = leaver(finspin,2,2)[0][0].real/(2*pi)
+    ifring = leaver(finspin,2,2)[0].real/(2*pi)
 
     return ifring / (1.0 - EradRational0815(eta, chi1, chi2))
 
@@ -220,6 +220,6 @@ def fdamp(eta, chi1, chi2, finspin):
     if (finspin > 1.0):
         print("PhenomD fdamp function: final spin > 1.0 not supported\n")
         
-    ifdamp = -leaver(finspin,2,2)[0][0].imag/(2*pi)
+    ifdamp = -leaver(finspin,2,2)[0].imag/(2*pi)
 
     return ifdamp / (1.0 - EradRational0815(eta, chi1, chi2))
